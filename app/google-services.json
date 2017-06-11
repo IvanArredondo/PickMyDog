@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "291120032739",
+    "firebase_url": "https://pickmydog-8514a.firebaseio.com",
+    "project_id": "pickmydog-8514a",
+    "storage_bucket": "pickmydog-8514a.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:291120032739:android:0b930a8a242c9093",
+        "android_client_info": {
+          "package_name": "com.walnutapps.pickmydog"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "291120032739-t2dt6lv5b0iemjs7k55je8fgpn6l1b5b.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.walnutapps.pickmydog",
+            "certificate_hash": "cc4252b95f86d3bda95425a43468d69aeb3b2c26"
+          }
+        },
+        {
+          "client_id": "291120032739-nbon691uc6224q99t1i56kb5cgsoahtp.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB9oGxBJRI-0MoCyFyRF2wo7dOOdQy6css"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "291120032739-nbon691uc6224q99t1i56kb5cgsoahtp.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
