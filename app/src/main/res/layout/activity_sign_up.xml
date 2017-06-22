@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.walnutapps.pickmydog.SignUpActivity"><![CDATA[
+
+    />
+
+    ]]>
+
+    <ToggleButton
+        android:id="@+id/emailToggleButton"
+        style="?android:attr/borderlessButtonStyle"
+        android:layout_width="166dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="25dp"
+        android:layout_marginTop="229dp"
+        android:checked="false"
+        android:paddingLeft="50dp"
+        android:paddingRight="55dp"
+        android:text="Email"
+        android:textOff="Email"
+        android:textOn="Email"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ToggleButton
+        android:id="@+id/phoneToggleButton"
+        style="?android:attr/borderlessButtonStyle"
+        android:layout_width="166dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="26dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginTop="229dp"
+        android:checked="true"
+        android:elevation="0dp"
+        android:fadingEdge="none"
+        android:paddingLeft="50dp"
+        android:paddingRight="55dp"
+        android:text="Phone"
+        android:textOff="Phone"
+        android:textOn="Phone"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toLeftOf="@+id/emailToggleButton"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <View
+        android:id="@+id/phoneOptionView"
+        android:layout_width="166dp"
+        android:layout_height="1dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginLeft="26dp"
+        android:layout_marginRight="8dp"
+        android:background="#c0c0c0"
+        app:layout_constraintHorizontal_bias="0.125"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginTop="-1dp"
+        app:layout_constraintTop_toBottomOf="@+id/phoneToggleButton" />
+
+    <View
+        android:id="@+id/emailOptionView"
+        android:layout_width="166dp"
+        android:layout_height="1dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="36dp"
+        android:layout_marginTop="-8dp"
+        android:background="#c0c0c0"
+        android:visibility="invisible"
+        app:layout_constraintHorizontal_bias="0.919"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/emailToggleButton" />
+
+    <EditText
+        android:id="@+id/phoneEditText"
+        android:layout_width="308dp"
+        android:layout_height="44dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginTop="14dp"
+        android:ems="10"
+        android:hint="Phone #"
+        android:inputType="phone"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/phoneToggleButton"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp" />
+
+    <EditText
+        android:id="@+id/emailEditText"
+        android:layout_width="308dp"
+        android:layout_height="44dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginTop="14dp"
+        android:ems="10"
+        android:hint="Email"
+        android:inputType="textEmailAddress"
+        android:visibility="invisible"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/phoneToggleButton"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        app:layout_constraintHorizontal_bias="0.3" />
+
+    <EditText
+        android:id="@+id/fullNamEditText"
+        android:layout_width="308dp"
+        android:layout_height="43dp"
+        android:ems="10"
+        android:hint="Full Name"
+        android:inputType="textPersonName"
+        android:layout_marginTop="14dp"
+        app:layout_constraintTop_toBottomOf="@+id/emailEditText"
+        android:layout_marginLeft="8dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:layout_marginRight="8dp"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp" />
+
+    <EditText
+        android:id="@+id/editText5"
+        android:layout_width="308dp"
+        android:layout_height="44dp"
+        android:ems="10"
+        android:hint="Password"
+        android:inputType="textPassword"
+        android:layout_marginTop="14dp"
+        app:layout_constraintTop_toBottomOf="@+id/fullNamEditText"
+        android:layout_marginLeft="8dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:layout_marginRight="8dp"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp" /><![CDATA[
+
+
+
+    />
+
+]]>
+</android.support.constraint.ConstraintLayout>
