@@ -77,11 +77,6 @@ public class MainActivity extends AppCompatActivity {
         });
 
         FirebaseUser currentUser = mAuth.getCurrentUser();
-        if (currentUser != null){
-
-        }else{
-            Log.i("Info: ", "Not signed in");
-        }
 
         TextView logoTextView = (TextView)findViewById(R.id.logoTextView);
         Typeface custom_font = Typeface.createFromAsset(getAssets(),  "Pacifico-Regular.ttf");
@@ -106,10 +101,10 @@ public class MainActivity extends AppCompatActivity {
 
         if(user != null){
             //setup intent to switch pages
-            //Intent intent = new Intent(getApplicationContext(),null);
-            //intent.putExtra("Uid", user.getUid());
+            Intent intent = new Intent(getApplicationContext(),TabbedActivity.class);
+            intent.putExtra("Uid", user.getUid());
             Log.i("User Uid: ", user.getUid());
-           //startActivity(intent);
+           startActivity(intent);
         }else{
             //if theres a signout button, get rid of it
         }
