@@ -124,9 +124,9 @@ public class TabbedActivity extends AppCompatActivity {
                 case 0:
                     return null;
                 case 1:
-                    return "Versus";
+                    return null;
                 case 2:
-                    return "Leaderboard";
+                    return null;
             }
             return null;
         }
