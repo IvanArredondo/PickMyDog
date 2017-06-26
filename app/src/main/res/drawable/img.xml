@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <item
+        android:id="@+id/pic"
+        android:drawable="@drawable/messenger_button_white_bg_round"
+        />
+    <item android:drawable="@drawable/circle"/>
+
+
+</layer-list>

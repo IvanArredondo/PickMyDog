@@ -11,6 +11,7 @@ import android.os.StrictMode;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -39,11 +40,14 @@ import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthProvider;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -56,12 +60,15 @@ import javax.net.ssl.HttpsURLConnection;
 import static android.R.attr.data;
 
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+public class MainActivity extends AppCompatActivity {
 
     private FirebaseAuth mAuth;
     private CallbackManager mCallbackManager;
 
-    ImageView mImageView;
+    TextView logoTextView;
+
+    //Declaring database reference
+    DatabaseReference mDatabase;
 
 
     public void signupRedirect(View view){
@@ -74,6 +81,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        //Done in order to allow querying facebook to grab the profile picture;
         if (android.os.Build.VERSION.SDK_INT > 9) {
             StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
             StrictMode.setThreadPolicy(policy);
@@ -83,13 +91,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         FacebookSdk.sdkInitialize(getApplicationContext());
         AppEventsLogger.activateApp(this);
 
-
-
         mAuth = FirebaseAuth.getInstance();
 
-        mImageView = (ImageView)findViewById(R.id.mImageView);
 
-        findViewById(R.id.facebookSignoutButton).setOnClickListener(this);
+
+        //Set PickMyDog logo and font
+        logoTextView = (TextView)findViewById(R.id.logoTextView);
+        Typeface custom_font = Typeface.createFromAsset(getAssets(),  "Pacifico-Regular.ttf");
+        logoTextView.setTypeface(custom_font);
+
+        //initialize database
+        mDatabase = FirebaseDatabase.getInstance().getReference();
 
         //Initialize facebook login Button
         mCallbackManager = CallbackManager.Factory.create();
@@ -116,38 +128,29 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 // TODO: 2017-06-22
             }
         });
-
-        TextView logoTextView = (TextView)findViewById(R.id.logoTextView);
-        Typeface custom_font = Typeface.createFromAsset(getAssets(),  "Pacifico-Regular.ttf");
-
-        logoTextView.setTypeface(custom_font);
-
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-
-        //Check if user is signed in (non-null) and update UI accordingly.
         FirebaseUser currentUser = mAuth.getCurrentUser();
-       // updateUI(currentUser);
+        updateUI(currentUser);      //comment out when you want to test the sign in activity
     }
 
+    /*
+    Check if user is signed in (non-null) and update UI accordingly.
+    */
     private void updateUI(FirebaseUser user) {
         //hideProgressDialog();
 
         if(user != null){
-            Log.d("PHOTO    :    ",    user.getPhotoUrl().toString());
             Intent intent = new Intent(getApplicationContext(),TabbedActivity.class);
             intent.putExtra("Uid", user.getUid());
-            Log.i("User Uid: ", user.getUid());
-           // startActivity(intent);
-            findViewById(R.id.login_button).setVisibility(View.GONE);
-            findViewById(R.id.facebookSignoutButton).setVisibility(View.VISIBLE);
+            Log.i("User params: ", user.getUid() + "  " + user.getDisplayName() + "  " + user.getEmail() + "  " + user.getProviderId());
+            startActivity(intent);        //comment this out when you want to test the sign in activity
         } else {
+            Log.i("User info: " , "Firebase user = null");
 
-            findViewById(R.id.login_button).setVisibility(View.VISIBLE);
-            findViewById(R.id.facebookSignoutButton).setVisibility(View.GONE);
         }
 
     }
@@ -171,16 +174,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         if(task.isSuccessful()){
                             Log.d("facebook sign in: ", " SUCCESS");
                             FirebaseUser user = mAuth.getCurrentUser();
-//                            ImageDownloader imageDownloader = new ImageDownloader();
-//                            try {
-//                                Bitmap bitmap = imageDownloader.execute(token).get();
-//                                mImageView.setImageBitmap(bitmap);
-//                            } catch (InterruptedException e) {
-//                                e.printStackTrace();
-//                            } catch (ExecutionException e) {
-//                                e.printStackTrace();
-//                            }
-                            storeProfilePictureInDatabase(token);
+                            storeFacebookProfileInDatabase(token);
+                            Log.i("USER :  ", "ADDED TO DATABASE" +user.getUid());
                             updateUI(user);
                         }else{
                             Log.d("facebook sign in: ", "FAILURE");
@@ -192,7 +187,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     //will store the users profile picture the first time the log in. Done because dont have access to facebook once they open and close the app (b/c it goes straight to the next activity)
-    private void storeProfilePictureInDatabase(AccessToken token) {
+    private void storeFacebookProfileInDatabase(AccessToken token) {
         Bundle params = new Bundle();
         params.putString("fields", "id,email,gender,cover,picture.type(large)");
         /* make the API call */
@@ -212,8 +207,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                     HttpsURLConnection conn1 = (HttpsURLConnection) profilePicUrl.openConnection();
                                     conn1.connect();
                                     InputStream inputStream = conn1.getInputStream();
-                                    Bitmap profilePic= BitmapFactory.decodeStream(inputStream);
-                                    mImageView.setImageBitmap(profilePic);
+                                    Bitmap profilePicBitMap = BitmapFactory.decodeStream(inputStream);
+                                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                                    profilePicBitMap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+                                    byte[] bytes = baos.toByteArray();
+                                    String base64Image = Base64.encodeToString(bytes, Base64.DEFAULT);
+
+                                    writeNewUser(mAuth.getCurrentUser(), base64Image);
                                     Log.i("FACEBOOK PICTURE GOT : ", " " + response.toString());
                                 }else{
                                     Log.i("FACEBOOK PICTURE GOT : ", " IN THE ELSE");
@@ -233,19 +233,30 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     public void signOut(){
-        //mAuth.signOut();
+        mAuth.signOut();
         LoginManager.getInstance().logOut();
         updateUI(null);
     }
 
-    public void onClick(View v) {
-        int i = v.getId();
-       if (i == R.id.facebookSignoutButton) {
-           signOut();
-       }
-
+    public String getUid() {
+        return FirebaseAuth.getInstance().getCurrentUser().getUid();
     }
 
+    private void writeNewUser(FirebaseUser user, String profilePicture) {
+
+        String name = user.getDisplayName();
+        String email = user.getEmail();
+        String uid = user.getUid();
+
+
+        Log.i("USER :  ", uid + "  ADDED TO DATABASE");
+
+
+        User newUser = new User(name, email, uid, profilePicture);
+        mDatabase.child("users").child(uid).setValue(newUser);
+        Log.i("USER :  ", "ADDED TO DATABASE");
+
+    }
 
 
 

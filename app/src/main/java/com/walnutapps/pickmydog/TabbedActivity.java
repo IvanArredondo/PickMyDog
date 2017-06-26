@@ -1,5 +1,6 @@
 package com.walnutapps.pickmydog;
 
+import android.content.Intent;
 import android.support.design.widget.TabLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -11,6 +12,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -36,10 +38,22 @@ public class TabbedActivity extends AppCompatActivity {
      */
     private ViewPager mViewPager;
 
+    String Uid;
+
+    public void addDogClick(View v){
+        Log.i("Add Dog Button", "Clicked");
+        Intent intent = new Intent(getApplicationContext(), DogProfileActivity.class);
+        startActivity(intent);
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tabbed);
+
+
+        Uid = getIntent().getStringExtra("Uid");
+
 
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
@@ -55,6 +69,7 @@ public class TabbedActivity extends AppCompatActivity {
         tabLayout.getTabAt(0).setIcon(R.drawable.com_facebook_profile_picture_blank_square);
         tabLayout.getTabAt(1).setIcon(R.drawable.com_facebook_profile_picture_blank_portrait);
         tabLayout.getTabAt(2).setIcon(R.drawable.com_facebook_profile_picture_blank_portrait);
+
 
     }
 
@@ -98,7 +113,7 @@ public class TabbedActivity extends AppCompatActivity {
             //returning the current tabs
             switch (position){
                 case 0:
-                    TabProfile tabProfile = new TabProfile();
+                    TabProfile tabProfile = new TabProfile(Uid);
                     return tabProfile;
                 case 1:
                     TabVersus tabVersus = new TabVersus();
