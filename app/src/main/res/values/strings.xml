@@ -4,6 +4,5 @@
     <string name="fb_login_protocol_scheme">fb323341381419710</string>
     <string name="title_activity_tabbed">TabbedActivity</string>
     <string name="action_settings">Settings</string>
-    <string name="section_format">Hello World from section: %1$d</string>
 
 </resources>
