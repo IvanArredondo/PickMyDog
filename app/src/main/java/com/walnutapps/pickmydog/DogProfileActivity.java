@@ -50,6 +50,7 @@ public class DogProfileActivity extends AppCompatActivity {
             }else{
                 Log.i("The Views ID: ", (String) v.getTag());
                 getPhoto();
+                //remove this commennt
             }
         }
 
