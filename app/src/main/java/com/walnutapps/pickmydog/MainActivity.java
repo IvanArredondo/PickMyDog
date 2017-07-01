@@ -71,6 +71,7 @@ public class MainActivity extends AppCompatActivity {
     DatabaseReference mDatabase;
 
 
+
     public void signupRedirect(View view){
         Intent intent = new Intent(getApplicationContext(), SignUpActivity.class);
         startActivity(intent);
@@ -91,17 +92,23 @@ public class MainActivity extends AppCompatActivity {
         FacebookSdk.sdkInitialize(getApplicationContext());
         AppEventsLogger.activateApp(this);
 
+        //offline capabilities enabled
+        FirebaseDatabase.getInstance().setPersistenceEnabled(true);
+
         mAuth = FirebaseAuth.getInstance();
-
-
 
         //Set PickMyDog logo and font
         logoTextView = (TextView)findViewById(R.id.logoTextView);
         Typeface custom_font = Typeface.createFromAsset(getAssets(),  "Pacifico-Regular.ttf");
         logoTextView.setTypeface(custom_font);
 
-        //initialize database
+        //initializing local database;
+        //DatabaseHandler localDB = new DatabaseHandler(this);
+
+        //initialize cloud database
         mDatabase = FirebaseDatabase.getInstance().getReference();
+        mDatabase.keepSynced(true);
+
 
         //Initialize facebook login Button
         mCallbackManager = CallbackManager.Factory.create();
@@ -149,9 +156,14 @@ public class MainActivity extends AppCompatActivity {
             Log.i("User params: ", user.getUid() + "  " + user.getDisplayName() + "  " + user.getEmail() + "  " + user.getProviderId());
             startActivity(intent);        //comment this out when you want to test the sign in activity
         } else {
+            checkLocalDatabase();
             Log.i("User info: " , "Firebase user = null");
 
         }
+
+    }
+
+    private void checkLocalDatabase() {
 
     }
 
@@ -176,7 +188,6 @@ public class MainActivity extends AppCompatActivity {
                             FirebaseUser user = mAuth.getCurrentUser();
                             storeFacebookProfileInDatabase(token);
                             Log.i("USER :  ", "ADDED TO DATABASE" +user.getUid());
-                            updateUI(user);
                         }else{
                             Log.d("facebook sign in: ", "FAILURE");
                             Toast.makeText(MainActivity.this, "Authentication  failed", Toast.LENGTH_SHORT).show();
@@ -211,6 +222,7 @@ public class MainActivity extends AppCompatActivity {
                                     ByteArrayOutputStream baos = new ByteArrayOutputStream();
                                     profilePicBitMap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
                                     byte[] bytes = baos.toByteArray();
+                                    Log.i("THE BYTES: ", " " + bytes.toString());
                                     String base64Image = Base64.encodeToString(bytes, Base64.DEFAULT);
 
                                     writeNewUser(mAuth.getCurrentUser(), base64Image);
@@ -247,15 +259,17 @@ public class MainActivity extends AppCompatActivity {
         String name = user.getDisplayName();
         String email = user.getEmail();
         String uid = user.getUid();
+        int numberOfDogs = 0;
 
 
         Log.i("USER :  ", uid + "  ADDED TO DATABASE");
 
 
-        User newUser = new User(name, email, uid, profilePicture);
+        User newUser = new User(uid, name, email, profilePicture, numberOfDogs);
         mDatabase.child("users").child(uid).setValue(newUser);
         Log.i("USER :  ", "ADDED TO DATABASE");
 
+        updateUI(user);
     }
 
 

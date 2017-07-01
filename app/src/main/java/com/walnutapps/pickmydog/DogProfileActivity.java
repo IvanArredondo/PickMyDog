@@ -15,10 +15,17 @@ import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.Toast;
+
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import java.io.IOException;
 
@@ -39,6 +46,12 @@ public class DogProfileActivity extends AppCompatActivity {
     FloatingActionButton floatingActionButton5;
 
     String buttonTagSelected = null;
+
+    String Uid;
+
+    private StorageReference mStorageRef;
+
+
 
 
     public void changePicture(View v){
@@ -74,9 +87,36 @@ public class DogProfileActivity extends AppCompatActivity {
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater menuInflater = getMenuInflater();
+        menuInflater.inflate(R.menu.edit_menu, menu);
+        Log.i("MENu:", "MENu is being inflated");
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        super.onOptionsItemSelected(item);
+
+        switch (item.getItemId()){
+            case R.id.done:
+                Log.i("Menu item selected", "Done");
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dog_profile);
+        Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
+        myToolbar.setTitle("Add a dog");
+        setSupportActionBar(myToolbar);
+
+
+        Uid = getIntent().getStringExtra("Uid");
 
         dogMainPictureImageView = (ImageView)findViewById(R.id.dogMainPictureImageView);
         dogPictureImageView1 = (ImageView)findViewById(R.id.dogPictureImageView1);
@@ -92,6 +132,8 @@ public class DogProfileActivity extends AppCompatActivity {
         floatingActionButton4 = (FloatingActionButton)findViewById(R.id.floatingActionButton4);
         floatingActionButton5 = (FloatingActionButton)findViewById(R.id.floatingActionButton5);
 
+        mStorageRef = FirebaseStorage.getInstance().getReference();
+
         // TODO: 2017-06-25 Fix this version problem
         //rememeber that this might not work on some versions
 
@@ -104,6 +146,7 @@ public class DogProfileActivity extends AppCompatActivity {
         if(requestCode == 1 && resultCode == RESULT_OK && data != null){
 
             Uri selectedimage = data.getData();
+            StorageReference dogRef = mStorageRef.child("DogPhotos").child(Uid);
             try {
                 Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), selectedimage);
                 //RoundedBitmapDrawable roundedPicture = RoundedBitmapDrawableFactory.create(getResources(),bitmap);

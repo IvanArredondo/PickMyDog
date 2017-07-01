@@ -43,6 +43,7 @@ public class TabbedActivity extends AppCompatActivity {
     public void addDogClick(View v){
         Log.i("Add Dog Button", "Clicked");
         Intent intent = new Intent(getApplicationContext(), DogProfileActivity.class);
+        intent.putExtra("uid", Uid);
         startActivity(intent);
     }
 

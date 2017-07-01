@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "291120032739-kij7tu6nao9pflm7bf8720f74t73jevm.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.walnutapps.pickmydog",
+            "certificate_hash": "a57c28b6d4835845a5cc87ab6578b16bfa506f99"
+          }
+        },
+        {
           "client_id": "291120032739-t2dt6lv5b0iemjs7k55je8fgpn6l1b5b.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
