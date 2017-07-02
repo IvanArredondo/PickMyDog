@@ -24,10 +24,19 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 
 public class DogProfileActivity extends AppCompatActivity {
 
@@ -49,9 +58,16 @@ public class DogProfileActivity extends AppCompatActivity {
 
     String Uid;
 
+    Uri selectedimage;
+
+    boolean scaleUp = false;
+
     private StorageReference mStorageRef;
+    DatabaseReference mDatabase;
 
+    HashMap<String, Uri> dogPictureHashMap = new HashMap<>();
 
+    int numberOfDogs = 0;
 
 
     public void changePicture(View v){
@@ -72,6 +88,7 @@ public class DogProfileActivity extends AppCompatActivity {
 
     public void getPhoto(){
         Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+
         startActivityForResult(intent, 1);
     }
 
@@ -100,7 +117,21 @@ public class DogProfileActivity extends AppCompatActivity {
 
         switch (item.getItemId()){
             case R.id.done:
+                Log.i("Width of main: ", String.valueOf(dogMainPictureImageView.getWidth()));
+
+                Log.i("Width of iv1: ", String.valueOf(dogPictureImageView1.getWidth()));
                 Log.i("Menu item selected", "Done");
+                Iterator it = dogPictureHashMap.entrySet().iterator();
+                while (it.hasNext()) {
+                    HashMap.Entry pair = (HashMap.Entry)it.next();
+                    Log.i(String.valueOf(pair.getKey()), " = " + pair.getValue());
+                    it.remove(); // avoids a ConcurrentModificationException
+                }
+                   // StorageReference dogRef = mStorageRef.child("DogPhotos").child(Uid).child(String.valueOf(numberOfDogs)).child(dogPictureHashMap.);
+
+
+
+                finish();
                 return true;
             default:
                 return false;
@@ -111,12 +142,15 @@ public class DogProfileActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dog_profile);
+
+        //setting up the top action bar
         Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
         myToolbar.setTitle("Add a dog");
         setSupportActionBar(myToolbar);
 
+        Uid = getIntent().getStringExtra("uid");
+        Log.i("The Uid is :" ,Uid);
 
-        Uid = getIntent().getStringExtra("Uid");
 
         dogMainPictureImageView = (ImageView)findViewById(R.id.dogMainPictureImageView);
         dogPictureImageView1 = (ImageView)findViewById(R.id.dogPictureImageView1);
@@ -132,10 +166,31 @@ public class DogProfileActivity extends AppCompatActivity {
         floatingActionButton4 = (FloatingActionButton)findViewById(R.id.floatingActionButton4);
         floatingActionButton5 = (FloatingActionButton)findViewById(R.id.floatingActionButton5);
 
+
+
+
         mStorageRef = FirebaseStorage.getInstance().getReference();
 
         // TODO: 2017-06-25 Fix this version problem
         //rememeber that this might not work on some versions
+
+
+        mDatabase = FirebaseDatabase.getInstance().getReference();
+        mDatabase.child("users").child(Uid).child("numberOfDogs").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+
+                numberOfDogs = Integer.parseInt(dataSnapshot.getValue().toString());
+                Log.i("Number of dogs: ", String.valueOf(numberOfDogs));
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
 
     }
 
@@ -145,26 +200,37 @@ public class DogProfileActivity extends AppCompatActivity {
 
         if(requestCode == 1 && resultCode == RESULT_OK && data != null){
 
-            Uri selectedimage = data.getData();
-            StorageReference dogRef = mStorageRef.child("DogPhotos").child(Uid);
+            selectedimage = data.getData();
+            //dogPictureHashMap.put(buttonTagSelected, selectedimage);
+            cropImage();
+
+        }else if(requestCode == 2 && resultCode == RESULT_OK && data != null){
             try {
-                Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), selectedimage);
+                Log.i("BEfore bundle", "true");
+                Bundle bundle = data.getExtras();
+                Bitmap bitmap = bundle.getParcelable("data");
+                Log.i("After bundle", "true");
+
                 //RoundedBitmapDrawable roundedPicture = RoundedBitmapDrawableFactory.create(getResources(),bitmap);
                 //roundedPicture.setCornerRadius(Math.max(profilePictureBitmap.getWidth(), profilePictureBitmap.getHeight()) / 2.0f);
-               // roundedPicture.setCircular(true);
+                // roundedPicture.setCircular(true);
 
                 switch(buttonTagSelected){
                     case "floatingMainActionButton":
-                        dogMainPictureImageView.setImageBitmap(bitmap);
+                        Log.i("DOES IS GET HERE:", "YUP");
+                        if(scaleUp) {
+                            Log.i("The image size:", String.valueOf(dogMainPictureImageView.getWidth()));
 
-                        // TODO: 2017-06-25 inflate the xml of the profile activity in order to acess its imageview from here
-//                        RoundedBitmapDrawable roundedPicture = RoundedBitmapDrawableFactory.create(getResources(),bitmap);
-//                        roundedPicture.setCircular(true);
-//                        ImageView profilePageDogImageView = (ImageView)findViewById(R.id.dogPictureImageView);
-//                        profilePageDogImageView.setImageBitmap(bitmap);
+                            dogMainPictureImageView.setImageBitmap(Bitmap.createScaledBitmap(bitmap, dogMainPictureImageView.getWidth(), dogMainPictureImageView.getHeight(), false));
+                            scaleUp = false;
+                        }else{
+                            dogMainPictureImageView.setImageBitmap(bitmap);
+                        }
                         break;
                     case "floatingActionButton1":
-                        dogPictureImageView1.setImageBitmap(bitmap);
+
+                         dogPictureImageView1.setImageBitmap(bitmap);
+
                         break;
                     case "floatingActionButton2":
                         dogPictureImageView2.setImageBitmap(bitmap);
@@ -183,11 +249,60 @@ public class DogProfileActivity extends AppCompatActivity {
                         Toast.makeText(this, "Couldn't set that image, try again", Toast.LENGTH_SHORT).show();
                 }
                 Log.i("image", "successful");
-            } catch (IOException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
+
+        }else if(requestCode == 2 && resultCode == RESULT_CANCELED){
+            Log.i("Crop image:", " CANCELLED");
+        }
+    }
+
+    private void cropImage() {
+        int width = 290;
+        int height = 290;
+
+        if(buttonTagSelected.equals("floatingMainActionButton")){
+            if(dogMainPictureImageView.getWidth() >= 500){
+                width = 500;
+                height = 500;
+                scaleUp = true;
+            }else {
+                width = dogMainPictureImageView.getWidth();
+                height = dogMainPictureImageView.getHeight();
+            }
+
         }else{
-            Log.i("error", "no data");
+            width = dogPictureImageView1.getWidth();
+            height = dogPictureImageView1.getHeight();
+        }
+
+        try{
+            Log.i("Width: ", String.valueOf(width));
+            Log.i("height: ", String.valueOf(height));
+            Intent intent = new Intent("com.android.camera.action.CROP");
+            intent.setData(selectedimage); // location of the image, can be empty
+            intent.putExtra("outputX", width); // int
+            intent.putExtra("outputY", height); // int
+            intent.putExtra("scale", true); // boolean
+            intent.putExtra("scaleUpIfNeeded", true); // boolean
+            intent.putExtra("aspectX", 1); // int
+            intent.putExtra("aspectY", 1); // int
+            //intent.putExtra("spotlightX", spotlightX); // int
+            //intent.putExtra("spotlightY", spotlightY); // int
+            intent.putExtra("return-data", true); // boolean
+            //intent.putExtra("output", output); // string
+            //intent.putExtra("set-as-wallpaper", setAsWallpaper); // boolean
+            //intent.putExtra("showWhenLocked", showWhenLocked); // boolean
+            if(scaleUp) {
+
+                intent.putExtra("outputFormat", Uri.PARCELABLE_WRITE_RETURN_VALUE); // String
+            }
+            if (intent.resolveActivity(getPackageManager()) != null) {
+                startActivityForResult(intent, 2);
+            }
+        }catch (Exception e){
+            Log.i("Startingthecrop INtent:", "FAILED");
         }
     }
 }
