@@ -2,6 +2,7 @@ package com.walnutapps.pickmydog;
 
 import android.*;
 import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -33,10 +34,15 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.squareup.picasso.Picasso;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Locale;
 
 public class DogProfileActivity extends AppCompatActivity {
 
@@ -54,9 +60,9 @@ public class DogProfileActivity extends AppCompatActivity {
     FloatingActionButton floatingActionButton4;
     FloatingActionButton floatingActionButton5;
 
-    String buttonTagSelected = null;
+    String buttonTagSelected = "";
 
-    String Uid;
+    String Uid = "";
 
     Uri selectedimage;
 
@@ -69,6 +75,8 @@ public class DogProfileActivity extends AppCompatActivity {
 
     int numberOfDogs = 0;
 
+    boolean[] isImageOccupied = new boolean[6];
+
 
     public void changePicture(View v){
         buttonTagSelected = (String) v.getTag();
@@ -79,7 +87,6 @@ public class DogProfileActivity extends AppCompatActivity {
             }else{
                 Log.i("The Views ID: ", (String) v.getTag());
                 getPhoto();
-                //remove this commennt
             }
         }
 
@@ -121,10 +128,13 @@ public class DogProfileActivity extends AppCompatActivity {
 
                 Log.i("Width of iv1: ", String.valueOf(dogPictureImageView1.getWidth()));
                 Log.i("Menu item selected", "Done");
+
                 Iterator it = dogPictureHashMap.entrySet().iterator();
                 while (it.hasNext()) {
                     HashMap.Entry pair = (HashMap.Entry)it.next();
                     Log.i(String.valueOf(pair.getKey()), " = " + pair.getValue());
+                    StorageReference dogStorageReference = mStorageRef.child(Uid).child(String.valueOf(numberOfDogs)).child(String.valueOf(pair.getKey()));
+                    dogStorageReference.putFile((Uri)pair.getValue());
                     it.remove(); // avoids a ConcurrentModificationException
                 }
                    // StorageReference dogRef = mStorageRef.child("DogPhotos").child(Uid).child(String.valueOf(numberOfDogs)).child(dogPictureHashMap.);
@@ -167,9 +177,9 @@ public class DogProfileActivity extends AppCompatActivity {
         floatingActionButton5 = (FloatingActionButton)findViewById(R.id.floatingActionButton5);
 
 
-
-
         mStorageRef = FirebaseStorage.getInstance().getReference();
+
+
 
         // TODO: 2017-06-25 Fix this version problem
         //rememeber that this might not work on some versions
@@ -180,10 +190,8 @@ public class DogProfileActivity extends AppCompatActivity {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
 
-
                 numberOfDogs = Integer.parseInt(dataSnapshot.getValue().toString());
                 Log.i("Number of dogs: ", String.valueOf(numberOfDogs));
-
             }
 
             @Override
@@ -191,6 +199,8 @@ public class DogProfileActivity extends AppCompatActivity {
 
             }
         });
+
+       // StorageReference getDogPicturesStorageReference = mStorageRef.child(Uid).child(numberOfDogs).
 
     }
 
@@ -201,6 +211,7 @@ public class DogProfileActivity extends AppCompatActivity {
         if(requestCode == 1 && resultCode == RESULT_OK && data != null){
 
             selectedimage = data.getData();
+            Log.i("DOES IS GET HERE:", "Return from media store");
             //dogPictureHashMap.put(buttonTagSelected, selectedimage);
             cropImage();
 
@@ -211,42 +222,67 @@ public class DogProfileActivity extends AppCompatActivity {
                 Bitmap bitmap = bundle.getParcelable("data");
                 Log.i("After bundle", "true");
 
+
+                File file = createImageFile();
+                if (file != null) {
+                    FileOutputStream fout;
+                    try {
+                        fout = new FileOutputStream(file);
+                        bitmap.compress(Bitmap.CompressFormat.PNG, 100, fout);
+                        fout.flush();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    Uri uri = Uri.fromFile(file);
+                    dogPictureHashMap.put(buttonTagSelected, uri);
+                }
+
                 //RoundedBitmapDrawable roundedPicture = RoundedBitmapDrawableFactory.create(getResources(),bitmap);
                 //roundedPicture.setCornerRadius(Math.max(profilePictureBitmap.getWidth(), profilePictureBitmap.getHeight()) / 2.0f);
                 // roundedPicture.setCircular(true);
 
-                switch(buttonTagSelected){
-                    case "floatingMainActionButton":
-                        Log.i("DOES IS GET HERE:", "YUP");
-                        if(scaleUp) {
-                            Log.i("The image size:", String.valueOf(dogMainPictureImageView.getWidth()));
+                for(int i = 0; i < 6; i++){
+                    if(!isImageOccupied[i]){
+                        switch (i){
+                            case 0:
+                                Log.i("DOES IS GET HERE:", "YUP");
+                                if(scaleUp) {
+                                    Log.i("The image size:", String.valueOf(dogMainPictureImageView.getWidth()));
 
-                            dogMainPictureImageView.setImageBitmap(Bitmap.createScaledBitmap(bitmap, dogMainPictureImageView.getWidth(), dogMainPictureImageView.getHeight(), false));
-                            scaleUp = false;
-                        }else{
-                            dogMainPictureImageView.setImageBitmap(bitmap);
+                                    dogMainPictureImageView.setImageBitmap(Bitmap.createScaledBitmap(bitmap, dogMainPictureImageView.getWidth(), dogMainPictureImageView.getHeight(), false));
+                                    scaleUp = false;
+                                    isImageOccupied[0] = true;
+                                }else{
+                                    dogMainPictureImageView.setImageBitmap(bitmap);
+                                }
+                                break;
+                            case 1:
+                                dogPictureImageView1.setImageBitmap(bitmap);
+                                isImageOccupied[1] = true;
+                                break;
+                            case 2:
+                                dogPictureImageView2.setImageBitmap(bitmap);
+                                isImageOccupied[2] = true;
+                                break;
+                            case 3:
+                                dogPictureImageView3.setImageBitmap(bitmap);
+                                isImageOccupied[3] = true;
+                                break;
+                            case 4:
+                                dogPictureImageView4.setImageBitmap(bitmap);
+                                isImageOccupied[4] = true;
+                                break;
+                            case 5:
+                                dogPictureImageView5.setImageBitmap(bitmap);
+                                isImageOccupied[5] = true;
+                                break;
+                            default:
+                                Log.i("INFO: ", "Couldn't set or get a picture (Switch statement)");
+                                Toast.makeText(this, "Couldn't set that image, try again", Toast.LENGTH_SHORT).show();
+
                         }
                         break;
-                    case "floatingActionButton1":
-
-                         dogPictureImageView1.setImageBitmap(bitmap);
-
-                        break;
-                    case "floatingActionButton2":
-                        dogPictureImageView2.setImageBitmap(bitmap);
-                        break;
-                    case "floatingActionButton3":
-                        dogPictureImageView3.setImageBitmap(bitmap);
-                        break;
-                    case "floatingActionButton4":
-                        dogPictureImageView4.setImageBitmap(bitmap);
-                        break;
-                    case "floatingActionButton5":
-                        dogPictureImageView5.setImageBitmap(bitmap);
-                        break;
-                    default:
-                        Log.i("INFO: ", "Couldn't set or get a picture (Switch statement)");
-                        Toast.makeText(this, "Couldn't set that image, try again", Toast.LENGTH_SHORT).show();
+                    }
                 }
                 Log.i("image", "successful");
             } catch (Exception e) {
@@ -294,10 +330,7 @@ public class DogProfileActivity extends AppCompatActivity {
             //intent.putExtra("output", output); // string
             //intent.putExtra("set-as-wallpaper", setAsWallpaper); // boolean
             //intent.putExtra("showWhenLocked", showWhenLocked); // boolean
-            if(scaleUp) {
-
-                intent.putExtra("outputFormat", Uri.PARCELABLE_WRITE_RETURN_VALUE); // String
-            }
+           // intent.putExtra("outputFormat", Uri.PARCELABLE_WRITE_RETURN_VALUE); // String
             if (intent.resolveActivity(getPackageManager()) != null) {
                 startActivityForResult(intent, 2);
             }
@@ -305,4 +338,24 @@ public class DogProfileActivity extends AppCompatActivity {
             Log.i("Startingthecrop INtent:", "FAILED");
         }
     }
+
+    //creating a file to save the bitmap in
+    public File createImageFile() {
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.CANADA).format(new Date());
+        String imageFileName = "JPEG_" + timeStamp + "_";
+        File mFileTemp = null;
+        String root= this.getDir("my_sub_dir", Context.MODE_PRIVATE).getAbsolutePath();
+        Log.i("The root: " , root);
+        File myDir = new File(root + "/Img");
+        if(!myDir.exists()){
+            myDir.mkdirs();
+        }
+        try {
+            mFileTemp=File.createTempFile(imageFileName,".jpg",myDir.getAbsoluteFile());
+        } catch (IOException e1) {
+            e1.printStackTrace();
+        }
+        return mFileTemp;
+    }
+    
 }

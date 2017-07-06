@@ -141,6 +141,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
         FirebaseUser currentUser = mAuth.getCurrentUser();
+        if(currentUser != null){
+            Log.d("main pge verificatin: ", String.valueOf(currentUser.isEmailVerified()));
+        }
         updateUI(currentUser);      //comment out when you want to test the sign in activity
     }
 
@@ -149,7 +152,8 @@ public class MainActivity extends AppCompatActivity {
     */
     private void updateUI(FirebaseUser user) {
         //hideProgressDialog();
-
+        // TODO: 2017-07-03 check if email sign up that it is email verified
+        //add && user.isEmailVerified() to if statement
         if(user != null){
             Intent intent = new Intent(getApplicationContext(),TabbedActivity.class);
             intent.putExtra("Uid", user.getUid());

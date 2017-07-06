@@ -21,6 +21,12 @@ import android.view.ViewGroup;
 
 import android.widget.TextView;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
 public class TabbedActivity extends AppCompatActivity {
 
     /**
@@ -38,7 +44,10 @@ public class TabbedActivity extends AppCompatActivity {
      */
     private ViewPager mViewPager;
 
-    String Uid;
+   public String Uid;
+    int numberOfDogs;
+
+    DatabaseReference mDatabase;
 
     public void addDogClick(View v){
         Log.i("Add Dog Button", "Clicked");
@@ -52,8 +61,28 @@ public class TabbedActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tabbed);
 
+        mDatabase = FirebaseDatabase.getInstance().getReference();
+        mDatabase.keepSynced(true);
 
         Uid = getIntent().getStringExtra("Uid");
+
+        mDatabase.child("users").child(Uid).child("numberOfDogs").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+
+                numberOfDogs = Integer.parseInt(dataSnapshot.getValue().toString());
+                Log.i("Number of dogs: ", String.valueOf(numberOfDogs));
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+
 
 
         // Create the adapter that will return a fragment for each of the three
@@ -114,7 +143,7 @@ public class TabbedActivity extends AppCompatActivity {
             //returning the current tabs
             switch (position){
                 case 0:
-                    TabProfile tabProfile = new TabProfile(Uid);
+                    TabProfile tabProfile = new TabProfile(Uid, numberOfDogs);
                     return tabProfile;
                 case 1:
                     TabVersus tabVersus = new TabVersus();
@@ -146,5 +175,9 @@ public class TabbedActivity extends AppCompatActivity {
             }
             return null;
         }
+    }
+
+    public String getUid(){
+        return this.Uid;
     }
 }
