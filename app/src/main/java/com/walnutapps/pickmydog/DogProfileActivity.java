@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
 import android.provider.MediaStore;
@@ -25,6 +26,9 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -34,6 +38,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.squareup.picasso.Picasso;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -76,6 +81,10 @@ public class DogProfileActivity extends AppCompatActivity {
     int numberOfDogs = 0;
 
     boolean[] isImageOccupied = new boolean[6];
+
+    final long ONE_MEGABYTE = 1024 * 1024;
+
+    String[] photoNamesArray = {"floatingMainActionButton","floatingActionButton1", "floatingActionButton2", "floatingActionButton3", "floatingActionButton4", "floatingActionButton5"};
 
 
     public void changePicture(View v){
@@ -200,7 +209,46 @@ public class DogProfileActivity extends AppCompatActivity {
             }
         });
 
-       // StorageReference getDogPicturesStorageReference = mStorageRef.child(Uid).child(numberOfDogs).
+        for(final String photoName : photoNamesArray) {
+
+            StorageReference getDogPicturesStorageReference = mStorageRef.child(Uid).child(String.valueOf(numberOfDogs)).child(photoName);
+
+            getDogPicturesStorageReference.getBytes(ONE_MEGABYTE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
+                @Override
+                public void onSuccess(byte[] bytes) {
+                    Bitmap dogPictureBitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                    switch (photoName){
+                        case "floatingMainActionButton":
+                            dogMainPictureImageView.setImageBitmap(Bitmap.createScaledBitmap(dogPictureBitmap, dogMainPictureImageView.getWidth(), dogMainPictureImageView.getHeight(), false));
+                            break;
+                        case "floatingActionButton1":
+                            dogPictureImageView1.setImageBitmap(dogPictureBitmap);
+                            break;
+                        case "floatingActionButton2":
+                            dogPictureImageView2.setImageBitmap(dogPictureBitmap);
+                            break;
+                        case "floatingActionButton3":
+                            dogPictureImageView3.setImageBitmap(dogPictureBitmap);
+                            break;
+                        case "floatingActionButton4":
+                            dogPictureImageView4.setImageBitmap(dogPictureBitmap);
+                            break;
+                        case "floatingActionButton5":
+                            dogPictureImageView5.setImageBitmap(dogPictureBitmap);
+                            break;
+                        default:
+                            Log.i("INFO: ", "Couldn't get a picture from cloud (Switch statement)");
+
+                    }
+                    // Data for "images/island.jpg" is returns, use this as needed
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception exception) {
+                    // Handle any errors
+                }
+            });
+        }
 
     }
 
@@ -222,6 +270,8 @@ public class DogProfileActivity extends AppCompatActivity {
                 Bitmap bitmap = bundle.getParcelable("data");
                 Log.i("After bundle", "true");
 
+//                ByteArrayOutputStream stream = new ByteArrayOutputStream();
+//                bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
 
                 File file = createImageFile();
                 if (file != null) {
@@ -236,6 +286,9 @@ public class DogProfileActivity extends AppCompatActivity {
                     Uri uri = Uri.fromFile(file);
                     dogPictureHashMap.put(buttonTagSelected, uri);
                 }
+
+
+
 
                 //RoundedBitmapDrawable roundedPicture = RoundedBitmapDrawableFactory.create(getResources(),bitmap);
                 //roundedPicture.setCornerRadius(Math.max(profilePictureBitmap.getWidth(), profilePictureBitmap.getHeight()) / 2.0f);
@@ -258,10 +311,18 @@ public class DogProfileActivity extends AppCompatActivity {
                                 break;
                             case 1:
                                 dogPictureImageView1.setImageBitmap(bitmap);
+
+//                                Glide.with(this)
+//                                        .load(stream.toByteArray())
+//                                        .into(dogPictureImageView1);
+
                                 isImageOccupied[1] = true;
                                 break;
                             case 2:
                                 dogPictureImageView2.setImageBitmap(bitmap);
+//                                Glide.with(this)
+//                                        .load(stream.toByteArray())
+//                                        .into(dogPictureImageView2);
                                 isImageOccupied[2] = true;
                                 break;
                             case 3:
@@ -357,5 +418,5 @@ public class DogProfileActivity extends AppCompatActivity {
         }
         return mFileTemp;
     }
-    
+
 }

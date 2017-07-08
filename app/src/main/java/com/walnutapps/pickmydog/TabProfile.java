@@ -51,6 +51,8 @@ public class  TabProfile extends Fragment {
     RoundedBitmapDrawable dogRoundedPictureBitmap;
     RoundedBitmapDrawable profilePictureRoundedPictureBitmap;
 
+    final long ONE_MEGABYTE = 1024 * 1024;
+
     public  TabProfile(String uid, int numberOfDogs) {
         this.Uid = uid;
         this.numberOfDogs = numberOfDogs;
@@ -77,11 +79,6 @@ public class  TabProfile extends Fragment {
     }
 
     private void setProfilePicture(byte[] bytes) {
-
-
-
-
-
 
     }
 
@@ -141,10 +138,11 @@ public class  TabProfile extends Fragment {
         }
 
 
-        final long ONE_MEGABYTE = 1024 * 1024;
+
 
         //if there already exists a picture for the dog
         if (dogRoundedPictureBitmap != null) {
+            Log.i("dog image: ", "saved in memory");
             dogPictureImageView.setImageDrawable(dogRoundedPictureBitmap);
         } else {
             StorageReference dogProfilePictureStorageReference = mStorageRef.child(Uid).child(String.valueOf(numberOfDogs)).child("floatingMainActionButton");

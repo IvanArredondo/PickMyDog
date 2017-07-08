@@ -21,6 +21,7 @@ import android.view.ViewGroup;
 
 import android.widget.TextView;
 
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -81,7 +82,6 @@ public class TabbedActivity extends AppCompatActivity {
 
             }
         });
-
 
 
 
@@ -179,5 +179,9 @@ public class TabbedActivity extends AppCompatActivity {
 
     public String getUid(){
         return this.Uid;
+    }
+    public void goToDogPublic(View v){
+        Intent intent = new Intent(getApplicationContext(), DogPublicActivity.class);
+        startActivity(intent);
     }
 }

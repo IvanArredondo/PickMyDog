@@ -45,7 +45,8 @@
             android:name=".TabbedActivity"
             android:label="@string/title_activity_tabbed"
             android:theme="@style/AppTheme" />
-        <activity android:name=".DogProfileActivity"></activity>
+        <activity android:name=".DogProfileActivity" />
+        <activity android:name=".DogPublicActivity"></activity>
     </application>
 
 </manifest>

@@ -1,4 +1,5 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -8,10 +9,23 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.walnutapps.pickmydog.TabbedActivity$PlaceholderFragment">
 
-    <TextView
-        android:id="@+id/section_label"
+    <ImageView
+        android:id="@+id/dogTopVersusImageView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Tab2 Contents"/>
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:onClick="goToDogPublic"
+        app:srcCompat="@drawable/com_facebook_profile_picture_blank_square" />
+
+    <ImageView
+        android:id="@+id/dogBottomVersusImageView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignStart="@+id/dogTopVersusImageView"
+        android:layout_below="@+id/dogTopVersusImageView"
+        android:layout_marginTop="18dp"
+        android:onClick="goToDogPublic"
+        app:srcCompat="@drawable/com_facebook_profile_picture_blank_square" />
 
 </RelativeLayout>
