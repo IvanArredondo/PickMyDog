@@ -2,6 +2,7 @@ package com.walnutapps.pickmydog;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -23,6 +24,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Objects;
@@ -42,7 +44,46 @@ public class TabVersus extends Fragment {
     ImageView dogTopVersusImageView;
     ImageView dogBottomVersusImageView;
 
+    String newIdNumber =  "";
+    Long numberOfDogs = 0l;
+
     final long ONE_MEGABYTE = 1024 * 1024;
+    String[] photoNamesArray = {"floatingMainActionButton","floatingActionButton1", "floatingActionButton2", "floatingActionButton3", "floatingActionButton4", "floatingActionButton5"};
+    ArrayList<Bitmap> imagesBitmapArrayList = new ArrayList<>();
+    Bitmap[] imagesBitmapArray = new Bitmap[6];
+
+    private class DownloadFilesTask extends AsyncTask<Void, Void, Void> {
+        protected Void doInBackground(Void... urls) {
+            int count = 0;
+
+            for(final String photoName : photoNamesArray) {
+                StorageReference getDogPicturesStorageReference = mStorageRef.child(newIdNumber).child(String.valueOf(numberOfDogs)).child(photoName);
+
+                final int finalCount = count;
+                getDogPicturesStorageReference.getBytes(ONE_MEGABYTE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
+                    @Override
+                    public void onSuccess(byte[] bytes) {
+                        Bitmap dogPictureBitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                        imagesBitmapArray[finalCount] = dogPictureBitmap;
+
+
+                        // Data for "images/island.jpg" is returns, use this as needed
+                    }
+                });
+                count ++;
+            }
+            return null;
+        }
+
+
+        protected void onProgressUpdate(Integer... progress) {
+            //setProgressPercent(progress[0]);
+        }
+
+        protected void onPostExecute(Long result) {
+            //showDialog("Downloaded " + result + " bytes");
+        }
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -50,6 +91,10 @@ public class TabVersus extends Fragment {
 
         mDatabase = FirebaseDatabase.getInstance().getReference();
         mStorageRef = FirebaseStorage.getInstance().getReference();
+
+
+        getTwoDogs();
+
     }
 
     @Override
@@ -60,7 +105,7 @@ public class TabVersus extends Fragment {
         dogTopVersusImageView = (ImageView)rootView.findViewById(R.id.dogTopVersusImageView);
         dogBottomVersusImageView = (ImageView)rootView.findViewById(R.id.dogBottomVersusImageView);
 
-        getTwoDogs();
+
 
         return rootView;
     }
@@ -89,8 +134,8 @@ public class TabVersus extends Fragment {
                 }
                 DataSnapshot randomuser = ids.next();
 
-                String newIdNumber = (String) randomuser.getKey();
-                Long numberOfDogs = (Long)randomuser.child("numberOfDogs").getValue();
+                newIdNumber = (String) randomuser.getKey();
+                numberOfDogs = (Long)randomuser.child("numberOfDogs").getValue();
 
                 StorageReference getDogPicturesStorageReference = mStorageRef.child(newIdNumber).child(String.valueOf(numberOfDogs)).child("floatingMainActionButton");
                 getDogPicturesStorageReference.getBytes(ONE_MEGABYTE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
@@ -143,6 +188,25 @@ public class TabVersus extends Fragment {
                     }
                 });
 
+                int counter = 0;
+
+                for( String photoName : photoNamesArray) {
+                    StorageReference getPicturesStorageReference = mStorageRef.child(newIdNumber).child(String.valueOf(numberOfDogs)).child(photoName);
+
+                    final int finalCount = count;
+                    getPicturesStorageReference.getBytes(ONE_MEGABYTE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
+                        @Override
+                        public void onSuccess(byte[] bytes) {
+                            Bitmap dogPictureBitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                            imagesBitmapArray[finalCount] = dogPictureBitmap;
+
+
+                            // Data for "images/island.jpg" is returns, use this as needed
+                        }
+                    });
+                    counter ++;
+                }
+
 
                 //Log.i("Random UID: ", newIdNumber);
                 //Log.i("Num of dogs: ", String.valueOf(numberOfDogs));
@@ -156,7 +220,30 @@ public class TabVersus extends Fragment {
 
         });
 
+
+    }
+
+//    private void getImages() {
+//        int count = 0;
+//
+//        for(final String photoName : photoNamesArray) {
+//            StorageReference getDogPicturesStorageReference = mStorageRef.child(Uid).child(String.valueOf(dogNumber)).child(photoName);
+//
+//            final int finalCount = count;
+//            getDogPicturesStorageReference.getBytes(ONE_MEGABYTE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
+//                @Override
+//                public void onSuccess(byte[] bytes) {
+//                    Bitmap dogPictureBitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+//                    imagesBitmapArrayList.add(dogPictureBitmap);
+//
+//
+//                    // Data for "images/island.jpg" is returns, use this as needed
+//                }
+//            });
+//            count ++;
+//        }
+
     }
 
 
-}
+

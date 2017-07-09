@@ -182,6 +182,8 @@ public class TabbedActivity extends AppCompatActivity {
     }
     public void goToDogPublic(View v){
         Intent intent = new Intent(getApplicationContext(), DogPublicActivity.class);
+        intent.putExtra("Uid", Uid);
+        intent.putExtra("numberOfDogs", numberOfDogs);
         startActivity(intent);
     }
 }
