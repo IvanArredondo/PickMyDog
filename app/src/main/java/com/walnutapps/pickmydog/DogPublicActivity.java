@@ -5,7 +5,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
-import static com.walnutapps.pickmydog.R.id.pager;
+
 
 public class DogPublicActivity extends AppCompatActivity {
 
@@ -19,12 +19,12 @@ public class DogPublicActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dog_public);
 
-        ViewPager mImageViewPager = (ViewPager) findViewById(pager);
+       // ViewPager mImageViewPager = (ViewPager) findViewById(pager);
         Uid = getIntent().getStringExtra("Uid");
         getIntent().getIntExtra("numberOfDogs", numberOfDogs);
 
-        ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter(this, Uid, numberOfDogs);
-        mImageViewPager.setAdapter(viewPagerAdapter);
+//        ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter(this, Uid, numberOfDogs);
+//        mImageViewPager.setAdapter(viewPagerAdapter);
 
 
 

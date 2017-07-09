@@ -1,6 +1,8 @@
 package com.walnutapps.pickmydog;
 
+import android.app.Application;
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
@@ -38,21 +40,25 @@ public class ViewPagerAdapter extends PagerAdapter {
     private Integer[] images;
     String Uid = "";
     String[] photoNamesArray = {"floatingMainActionButton","floatingActionButton1", "floatingActionButton2", "floatingActionButton3", "floatingActionButton4", "floatingActionButton5"};
-    //ArrayList<Bitmap> imagesBitmapArray = new ArrayList<>();
+    ArrayList<Bitmap> imagesBitmapArrayList = new ArrayList<>();
     Bitmap[] imagesBitmapArray = new Bitmap[6];
     int dogNumber;
     final long ONE_MEGABYTE = 1024 * 1024;
+
+
+    Bitmap bitmap;
 
     private StorageReference mStorageRef;
 
 
 
-    public ViewPagerAdapter(Context context, String Uid, int dogNumber){
+    public ViewPagerAdapter(Context context){
         mStorageRef = FirebaseStorage.getInstance().getReference();
+        //
 
         this.context = context;
-        this.Uid = Uid;
-        this.dogNumber = dogNumber;
+//        this.Uid = Uid;
+//        this.dogNumber = dogNumber;
         //DownloadFilesTask dt = new DownloadFilesTask();
        // dt.execute();
         //getImages();
@@ -82,7 +88,8 @@ public class ViewPagerAdapter extends PagerAdapter {
 
     @Override
     public int getCount() {
-        return 5;
+
+        return imagesBitmapArrayList.size();
     }
 
     @Override
@@ -95,10 +102,12 @@ public class ViewPagerAdapter extends PagerAdapter {
 
         //Log.i("bitmap:", imagesBitmapArray[0].toString());
 
+
         layoutInflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View view = layoutInflater.inflate(R.layout.custom_layout, null);
-        ImageView imageView = (ImageView) view.findViewById(R.id.imageView);
-        imageView.setImageBitmap(imagesBitmapArray[position]);
+        ImageView imageView = (ImageView) view.findViewById(R.id.customImageView);
+        imageView.setImageBitmap(Bitmap.createScaledBitmap(imagesBitmapArrayList.get(position), context.getApplicationContext().getResources().getConfiguration().screenWidthDp, context.getApplicationContext().getResources().getConfiguration().screenWidthDp, false));
+        //imageView.setImageBitmap(imagesBitmapArrayList.get(position));
 
         ViewPager vp =  (ViewPager)container;
         vp.addView(view, 0);
@@ -117,5 +126,17 @@ public class ViewPagerAdapter extends PagerAdapter {
         View view = (View)object;
 
         vp.removeView(view);
+    }
+
+    public void addToBitmapArray(Bitmap bitmap){
+
+        imagesBitmapArrayList.add(bitmap);
+        notifyDataSetChanged();
+    }
+
+    @Override
+    public void notifyDataSetChanged() {
+        super.notifyDataSetChanged();
+
     }
 }

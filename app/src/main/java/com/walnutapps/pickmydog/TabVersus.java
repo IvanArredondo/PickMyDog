@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -32,6 +33,7 @@ import java.util.Random;
 
 import static com.facebook.FacebookSdk.getApplicationContext;
 
+
 /**
  * Created by Ivan on 2017-06-22.
  */
@@ -51,6 +53,9 @@ public class TabVersus extends Fragment {
     String[] photoNamesArray = {"floatingMainActionButton","floatingActionButton1", "floatingActionButton2", "floatingActionButton3", "floatingActionButton4", "floatingActionButton5"};
     ArrayList<Bitmap> imagesBitmapArrayList = new ArrayList<>();
     Bitmap[] imagesBitmapArray = new Bitmap[6];
+
+    ViewPager mImageViewPager1;
+    ViewPager mImageViewPager2;
 
     private class DownloadFilesTask extends AsyncTask<Void, Void, Void> {
         protected Void doInBackground(Void... urls) {
@@ -93,8 +98,6 @@ public class TabVersus extends Fragment {
         mStorageRef = FirebaseStorage.getInstance().getReference();
 
 
-        getTwoDogs();
-
     }
 
     @Override
@@ -102,10 +105,12 @@ public class TabVersus extends Fragment {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.versus_tab, container, false);
 
-        dogTopVersusImageView = (ImageView)rootView.findViewById(R.id.dogTopVersusImageView);
-        dogBottomVersusImageView = (ImageView)rootView.findViewById(R.id.dogBottomVersusImageView);
+        mImageViewPager1 = (ViewPager)rootView.findViewById(R.id.pager1);
+        mImageViewPager2  = (ViewPager)rootView.findViewById(R.id.pager2);
+       // dogTopVersusImageView = (ImageView)rootView.findViewById(R.id.imageView);
 
 
+        getTwoDogs();
 
         return rootView;
     }
@@ -116,7 +121,7 @@ public class TabVersus extends Fragment {
             public void onDataChange(DataSnapshot dataSnapshot) {
 
 
-
+                //finding number of users and then setting a random number between 0 inclusive and maxnum exclusive
                 long allNum = dataSnapshot.getChildrenCount();
                 int maxNum = (int)allNum;
                 int randomNum1 = new Random().nextInt(maxNum);
@@ -128,6 +133,7 @@ public class TabVersus extends Fragment {
 
 
                 Log.i("Random num 1: ", String.valueOf(randomNum1));
+                //moving along the users until the randomth user
                 while(ids.hasNext() && count < randomNum1) {
                     ids.next();
                     count ++; // used as positioning.
@@ -137,22 +143,48 @@ public class TabVersus extends Fragment {
                 newIdNumber = (String) randomuser.getKey();
                 numberOfDogs = (Long)randomuser.child("numberOfDogs").getValue();
 
-                StorageReference getDogPicturesStorageReference = mStorageRef.child(newIdNumber).child(String.valueOf(numberOfDogs)).child("floatingMainActionButton");
-                getDogPicturesStorageReference.getBytes(ONE_MEGABYTE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
-                    @Override
-                    public void onSuccess(byte[] bytes) {
-                        Bitmap dogPictureBitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
 
-                        dogTopVersusImageView.setImageBitmap(Bitmap.createScaledBitmap(dogPictureBitmap, dogTopVersusImageView.getWidth(), dogTopVersusImageView.getHeight(), false));
+                final ViewPagerAdapter viewPagerAdapter1 = new ViewPagerAdapter(getContext());
+
+                for( String photoName : photoNamesArray) {
+                    StorageReference getPicturesStorageReference = mStorageRef.child(newIdNumber).child(String.valueOf(numberOfDogs)).child(photoName);
+
+                    getPicturesStorageReference.getBytes(ONE_MEGABYTE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
+                        @Override
+                        public void onSuccess(byte[] bytes) {
+                            Bitmap dogPictureBitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                            //imagesBitmapArray[finalCount] = dogPictureBitmap;
+
+                            viewPagerAdapter1.addToBitmapArray(dogPictureBitmap);
+
+
+                            // Data for "images/island.jpg" is returns, use this as needed
                         }
-                        // Data for "images/island.jpg" is returns, use this as needed
+                    });
+                }
 
-                }).addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception exception) {
-                        Toast.makeText(getContext(), "Error, please load again", Toast.LENGTH_SHORT).show();
-                    }
-                });
+
+
+
+
+
+//                StorageReference getDogPicturesStorageReference = mStorageRef.child(newIdNumber).child(String.valueOf(numberOfDogs)).child("floatingMainActionButton");
+//                getDogPicturesStorageReference.getBytes(ONE_MEGABYTE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
+//                    @Override
+//                    public void onSuccess(byte[] bytes) {
+//                        Bitmap dogPictureBitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+//
+////                        ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter(getContext(), dogPictureBitmap);
+////                        mImageViewPager.setAdapter(viewPagerAdapter);
+//                        }
+//                        // Data for "images/island.jpg" is returns, use this as needed
+//
+//                }).addOnFailureListener(new OnFailureListener() {
+//                    @Override
+//                    public void onFailure(@NonNull Exception exception) {
+//                        Toast.makeText(getContext(), "Error, please load again", Toast.LENGTH_SHORT).show();
+//                    }
+//                });
                 int randomNum2;
                 while((randomNum2 = new Random().nextInt(maxNum)) == randomNum1);
                 ds = dataSnapshot.getChildren();
@@ -171,41 +203,45 @@ public class TabVersus extends Fragment {
                newIdNumber = (String) randomuser.getKey();
                 numberOfDogs = (Long)randomuser.child("numberOfDogs").getValue();
 
-                getDogPicturesStorageReference = mStorageRef.child(newIdNumber).child(String.valueOf(numberOfDogs)).child("floatingMainActionButton");
-                getDogPicturesStorageReference.getBytes(ONE_MEGABYTE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
-                    @Override
-                    public void onSuccess(byte[] bytes) {
-                        Bitmap dogPictureBitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-
-                        dogBottomVersusImageView.setImageBitmap(Bitmap.createScaledBitmap(dogPictureBitmap, dogTopVersusImageView.getWidth(), dogTopVersusImageView.getHeight(), false));
-                    }
-                    // Data for "images/island.jpg" is returns, use this as needed
-
-                }).addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception exception) {
-                        Toast.makeText(getContext(), "Error, please load again", Toast.LENGTH_SHORT).show();
-                    }
-                });
-
-                int counter = 0;
+                final ViewPagerAdapter viewPagerAdapter2 = new ViewPagerAdapter(getContext());
 
                 for( String photoName : photoNamesArray) {
                     StorageReference getPicturesStorageReference = mStorageRef.child(newIdNumber).child(String.valueOf(numberOfDogs)).child(photoName);
 
-                    final int finalCount = count;
                     getPicturesStorageReference.getBytes(ONE_MEGABYTE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
                         @Override
                         public void onSuccess(byte[] bytes) {
                             Bitmap dogPictureBitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-                            imagesBitmapArray[finalCount] = dogPictureBitmap;
+                            //imagesBitmapArray[finalCount] = dogPictureBitmap;
+
+                            viewPagerAdapter2.addToBitmapArray(dogPictureBitmap);
 
 
                             // Data for "images/island.jpg" is returns, use this as needed
                         }
                     });
-                    counter ++;
                 }
+
+//                getDogPicturesStorageReference = mStorageRef.child(newIdNumber).child(String.valueOf(numberOfDogs)).child("floatingMainActionButton");
+//                getDogPicturesStorageReference.getBytes(ONE_MEGABYTE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
+//                    @Override
+//                    public void onSuccess(byte[] bytes) {
+//                        Bitmap dogPictureBitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+//
+//                        dogBottomVersusImageView.setImageBitmap(Bitmap.createScaledBitmap(dogPictureBitmap, dogBottomVersusImageView.getWidth(), dogBottomVersusImageView.getHeight(), false));
+//                    }
+//                    // Data for "images/island.jpg" is returns, use this as needed
+//
+//                }).addOnFailureListener(new OnFailureListener() {
+//                    @Override
+//                    public void onFailure(@NonNull Exception exception) {
+//                        Toast.makeText(getContext(), "Error, please load again", Toast.LENGTH_SHORT).show();
+//                    }
+//                });
+
+
+                mImageViewPager1.setAdapter(viewPagerAdapter1);
+                mImageViewPager2.setAdapter(viewPagerAdapter2);
 
 
                 //Log.i("Random UID: ", newIdNumber);
