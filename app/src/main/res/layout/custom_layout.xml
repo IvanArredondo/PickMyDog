@@ -6,8 +6,9 @@
 
     <ImageView
         android:id="@+id/customImageView"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
+        android:layout_width="250dp"
+        android:layout_height="250dp"
+        android:layout_gravity="center_horizontal"
         android:adjustViewBounds="true"
         app:srcCompat="@drawable/com_facebook_profile_picture_blank_square" />
 </LinearLayout>

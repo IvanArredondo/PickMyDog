@@ -37,6 +37,7 @@ public class ViewPagerAdapter extends PagerAdapter {
 
     private Context context;
     private LayoutInflater layoutInflater;
+    ImageView imageView;
     private Integer[] images;
     String Uid = "";
     String[] photoNamesArray = {"floatingMainActionButton","floatingActionButton1", "floatingActionButton2", "floatingActionButton3", "floatingActionButton4", "floatingActionButton5"};
@@ -45,6 +46,7 @@ public class ViewPagerAdapter extends PagerAdapter {
     int dogNumber;
     final long ONE_MEGABYTE = 1024 * 1024;
 
+    public static int LOOPS_COUNT = 1000;
 
     Bitmap bitmap;
 
@@ -88,8 +90,15 @@ public class ViewPagerAdapter extends PagerAdapter {
 
     @Override
     public int getCount() {
-
-        return imagesBitmapArrayList.size();
+        if (imagesBitmapArrayList != null && imagesBitmapArrayList.size() > 0)
+        {
+            Log.i("in the If:", "viewpageradapter if state");
+            return imagesBitmapArrayList.size()*LOOPS_COUNT; // simulate infinite by big number of products
+        }
+        else
+        {
+            return 0;
+        }
     }
 
     @Override
@@ -101,12 +110,17 @@ public class ViewPagerAdapter extends PagerAdapter {
     public Object instantiateItem(ViewGroup container, int position) {
 
         //Log.i("bitmap:", imagesBitmapArray[0].toString());
-
+        int position2 = 0;
+if(imagesBitmapArrayList.size() == 0) {
+position2 = position ;
+}else {
+    position2 = position % imagesBitmapArrayList.size();
+}
 
         layoutInflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View view = layoutInflater.inflate(R.layout.custom_layout, null);
-        ImageView imageView = (ImageView) view.findViewById(R.id.customImageView);
-        imageView.setImageBitmap(Bitmap.createScaledBitmap(imagesBitmapArrayList.get(position), context.getApplicationContext().getResources().getConfiguration().screenWidthDp, context.getApplicationContext().getResources().getConfiguration().screenWidthDp, false));
+        imageView = (ImageView) view.findViewById(R.id.customImageView);
+        imageView.setImageBitmap(Bitmap.createScaledBitmap(imagesBitmapArrayList.get(position2), 300, 300, false));
         //imageView.setImageBitmap(imagesBitmapArrayList.get(position));
 
         ViewPager vp =  (ViewPager)container;

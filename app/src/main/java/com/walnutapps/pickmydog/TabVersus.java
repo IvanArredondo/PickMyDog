@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -54,7 +55,7 @@ public class TabVersus extends Fragment {
     ArrayList<Bitmap> imagesBitmapArrayList = new ArrayList<>();
     Bitmap[] imagesBitmapArray = new Bitmap[6];
 
-    ViewPager mImageViewPager1;
+    MyViewPager mImageViewPager1;
     ViewPager mImageViewPager2;
 
     private class DownloadFilesTask extends AsyncTask<Void, Void, Void> {
@@ -105,8 +106,22 @@ public class TabVersus extends Fragment {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.versus_tab, container, false);
 
-        mImageViewPager1 = (ViewPager)rootView.findViewById(R.id.pager1);
-        mImageViewPager2  = (ViewPager)rootView.findViewById(R.id.pager2);
+
+
+        mImageViewPager1 = (MyViewPager)rootView.findViewById(R.id.pager1);
+        //mImageViewPager1.setPageMargin(0);
+        //mImageViewPager1.setPadding(0,0,0,0);
+        mImageViewPager1.setClipToPadding(false);
+        // set padding manually, the more you set the padding the more you see of prev & next page
+        mImageViewPager1.setPadding(141, 0, 141, 0);
+        // sets a margin b/w individual pages to ensure that there is a gap b/w them
+        mImageViewPager1.setPageMargin(0);
+        mImageViewPager2  = (ViewPager) rootView.findViewById(R.id.pager2);
+        mImageViewPager2.setPadding(141, 0, 141, 0);
+        mImageViewPager2.setClipToPadding(false);
+        mImageViewPager2.setPageMargin(0);
+       // mImageViewPager2.setOffscreenPageLimit(6);
+       // mImageViewPager2.setCurrentItem(1, true);
        // dogTopVersusImageView = (ImageView)rootView.findViewById(R.id.imageView);
 
 
@@ -205,6 +220,8 @@ public class TabVersus extends Fragment {
 
                 final ViewPagerAdapter viewPagerAdapter2 = new ViewPagerAdapter(getContext());
 
+
+
                 for( String photoName : photoNamesArray) {
                     StorageReference getPicturesStorageReference = mStorageRef.child(newIdNumber).child(String.valueOf(numberOfDogs)).child(photoName);
 
@@ -215,6 +232,7 @@ public class TabVersus extends Fragment {
                             //imagesBitmapArray[finalCount] = dogPictureBitmap;
 
                             viewPagerAdapter2.addToBitmapArray(dogPictureBitmap);
+                            //wrappedAdapter.notifyDataSetChanged();
 
 
                             // Data for "images/island.jpg" is returns, use this as needed
@@ -240,7 +258,9 @@ public class TabVersus extends Fragment {
 //                });
 
 
+
                 mImageViewPager1.setAdapter(viewPagerAdapter1);
+                //mImageViewPager1.setCurrentItem(0, true);
                 mImageViewPager2.setAdapter(viewPagerAdapter2);
 
 

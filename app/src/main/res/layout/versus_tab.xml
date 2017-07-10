@@ -12,20 +12,24 @@
 
     tools:context="com.walnutapps.pickmydog.TabbedActivity$PlaceholderFragment">
 
-    <android.support.v4.view.ViewPager
+
+
+    <com.walnutapps.pickmydog.MyViewPager
         android:id="@+id/pager1"
         android:layout_width="match_parent"
-        android:layout_height="500dp"
+        android:layout_height="250dp"
         android:layout_marginLeft="0dp"
         android:layout_marginRight="0dp"
-        android:layout_marginStart="0dp">
+        android:layout_marginStart="0dp"
+        android:layout_marginBottom="13dp">
 
-    </android.support.v4.view.ViewPager>
+    </com.walnutapps.pickmydog.MyViewPager>
+
 
     <android.support.v4.view.ViewPager
         android:id="@+id/pager2"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="250dp"
         android:layout_below="@+id/pager1">
 
     </android.support.v4.view.ViewPager>
