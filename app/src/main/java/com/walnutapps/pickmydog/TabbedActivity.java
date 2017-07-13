@@ -58,6 +58,26 @@ public class TabbedActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onStart() {
+        super.onStart();
+        mDatabase.child("users").child(Uid).child("numberOfDogs").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+
+                numberOfDogs = Integer.parseInt(dataSnapshot.getValue().toString());
+                Log.i("On start dogs: ", String.valueOf(numberOfDogs));
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tabbed);
@@ -73,7 +93,7 @@ public class TabbedActivity extends AppCompatActivity {
 
 
                 numberOfDogs = Integer.parseInt(dataSnapshot.getValue().toString());
-                Log.i("Number of dogs: ", String.valueOf(numberOfDogs));
+                Log.i("On create of dogs: ", String.valueOf(numberOfDogs));
 
             }
 

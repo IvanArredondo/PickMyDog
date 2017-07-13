@@ -23,6 +23,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -57,6 +58,10 @@ public class DogProfileActivity extends AppCompatActivity {
     ImageView dogPictureImageView3;
     ImageView dogPictureImageView4;
     ImageView dogPictureImageView5;
+
+    EditText dogNameEditText;
+    EditText dogBreedEditText;
+    EditText dogDescriptionEditText;
 
     FloatingActionButton floatingMainActionButton;
     FloatingActionButton floatingActionButton1;
@@ -131,30 +136,42 @@ public class DogProfileActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         super.onOptionsItemSelected(item);
 
-        switch (item.getItemId()){
-            case R.id.done:
-                Log.i("Width of main: ", String.valueOf(dogMainPictureImageView.getWidth()));
+        if(dogNameEditText.getText().toString().isEmpty() || dogBreedEditText.getText().toString().isEmpty() || dogDescriptionEditText.getText().toString().isEmpty()){
+            Toast.makeText(this, "Please fill out all fields", Toast.LENGTH_SHORT).show();
+        }else {
 
-                Log.i("Width of iv1: ", String.valueOf(dogPictureImageView1.getWidth()));
-                Log.i("Menu item selected", "Done");
+            switch (item.getItemId()) {
+                case R.id.done:
+                    Dog newDog = new Dog(dogNameEditText.getText().toString(), dogBreedEditText.getText().toString(), dogDescriptionEditText.getText().toString(), Uid);
+                    String dogId = mDatabase.child("users").child(Uid).child("DogsList").push().getKey();
+                    Log.i("THE KEY: ", dogId);
+                    mDatabase.child("users").child(Uid).child("DogsList").child(String.valueOf(numberOfDogs)).setValue(dogId);
+                    mDatabase.child("users").child(Uid).child("numberOfDogs").setValue(numberOfDogs + 1);
+                    mDatabase.child("dogs").child(dogId).setValue(newDog);
 
-                Iterator it = dogPictureHashMap.entrySet().iterator();
-                while (it.hasNext()) {
-                    HashMap.Entry pair = (HashMap.Entry)it.next();
-                    Log.i(String.valueOf(pair.getKey()), " = " + pair.getValue());
-                    StorageReference dogStorageReference = mStorageRef.child(Uid).child(String.valueOf(numberOfDogs)).child(String.valueOf(pair.getKey()));
-                    dogStorageReference.putFile((Uri)pair.getValue());
-                    it.remove(); // avoids a ConcurrentModificationException
-                }
-                   // StorageReference dogRef = mStorageRef.child("DogPhotos").child(Uid).child(String.valueOf(numberOfDogs)).child(dogPictureHashMap.);
+                    Iterator it = dogPictureHashMap.entrySet().iterator();
+                    while (it.hasNext()) {
+                        HashMap.Entry pair = (HashMap.Entry) it.next();
+                        Log.i(String.valueOf(pair.getKey()), " = " + pair.getValue());
+                        StorageReference dogStorageReference = mStorageRef.child(Uid).child(dogId).child(String.valueOf(pair.getKey()));
+                        dogStorageReference.putFile((Uri) pair.getValue());
+                        it.remove(); // avoids a ConcurrentModificationException
 
 
+                    }
 
-                finish();
-                return true;
-            default:
-                return false;
+                    // StorageReference dogRef = mStorageRef.child("DogPhotos").child(Uid).child(String.valueOf(numberOfDogs)).child(dogPictureHashMap.);
+
+                    //might be a bit dangerous, worried that finish() will call before a users with shitty internet fully executes the above writing to the databse. Finish()
+                    //You finish Activity class with finish() method when you need to end the Activity immediatly at specific point. If you press back button, you will go
+                    // //through the lifecycle (onPause(), onStop() then onDestroy()) automatically.
+                    finish();
+                    return true;
+                default:
+                    return false;
+            }
         }
+        return false;
     }
 
     @Override
@@ -184,6 +201,10 @@ public class DogProfileActivity extends AppCompatActivity {
         floatingActionButton3 = (FloatingActionButton)findViewById(R.id.floatingActionButton3);
         floatingActionButton4 = (FloatingActionButton)findViewById(R.id.floatingActionButton4);
         floatingActionButton5 = (FloatingActionButton)findViewById(R.id.floatingActionButton5);
+
+        dogNameEditText = (EditText)findViewById(R.id.dogNameEditText);
+        dogBreedEditText = (EditText) findViewById(R.id.dogBreedEditText);
+        dogDescriptionEditText = (EditText)findViewById(R.id.dogDescriptionEditText);
 
 
         mStorageRef = FirebaseStorage.getInstance().getReference();

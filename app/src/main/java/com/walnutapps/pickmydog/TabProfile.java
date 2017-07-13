@@ -72,7 +72,9 @@ public class  TabProfile extends Fragment {
         mDatabase = FirebaseDatabase.getInstance().getReference();
         mStorageRef = FirebaseStorage.getInstance().getReference();
 
-        Log.i("THE TAB USER Id:", Uid);
+        mDatabase.keepSynced(true);
+
+        Log.i("tap profile DOGS:", String.valueOf(numberOfDogs));
 
 
         Log.i("HERRREEE", "All DONE" );
@@ -92,12 +94,14 @@ public class  TabProfile extends Fragment {
         dogPictureImageView = (ImageView) rootView.findViewById(R.id.dogPictureImageView);
 
 
+
         Log.i("HERRREEE", "called onCreateView");
 
         if(profilePictureRoundedPictureBitmap != null){
             profileCircleImageView.setImageDrawable(profilePictureRoundedPictureBitmap);
         }else {
 
+            // TODO: 2017-07-13 consider changing this to save the profile picture in the storage
             mDatabase.child("users").child(Uid).child("profilePicture").addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
@@ -140,7 +144,7 @@ public class  TabProfile extends Fragment {
 
 
 
-        //if there already exists a picture for the dog
+        //if there already exists a picture for the dog, consider moving this to TabbedActivity
         if (dogRoundedPictureBitmap != null) {
             Log.i("dog image: ", "saved in memory");
             dogPictureImageView.setImageDrawable(dogRoundedPictureBitmap);

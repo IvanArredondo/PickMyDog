@@ -52,6 +52,11 @@ public class ViewPagerAdapter extends PagerAdapter {
 
     private StorageReference mStorageRef;
 
+    boolean morePics = true;
+    boolean ready = false;
+    int counter;
+
+
 
 
     public ViewPagerAdapter(Context context){
@@ -109,27 +114,53 @@ public class ViewPagerAdapter extends PagerAdapter {
     @Override
     public Object instantiateItem(ViewGroup container, int position) {
 
-        //Log.i("bitmap:", imagesBitmapArray[0].toString());
-        int position2 = 0;
-if(imagesBitmapArrayList.size() == 0) {
-position2 = position ;
-}else {
-    position2 = position % imagesBitmapArrayList.size();
-}
+        Log.i("Positon      :", String.valueOf(position));
+        Log.i("Size of Array     :", String.valueOf(imagesBitmapArrayList.size()));
+        Log.i("Mod of the two above  :", " " + (position % imagesBitmapArrayList.size()));
+//        int position2;
+//        if(imagesBitmapArrayList.size() == 0) {
+//        position2 = 0 ;
+//        }else if(!this.morePics){
+//            position2 = position % imagesBitmapArrayList.size();
+//        }else{
+//            position2 = imagesBitmapArrayList.size()-1;
+//        }
 
-        layoutInflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View view = layoutInflater.inflate(R.layout.custom_layout, null);
-        imageView = (ImageView) view.findViewById(R.id.customImageView);
-        imageView.setImageBitmap(Bitmap.createScaledBitmap(imagesBitmapArrayList.get(position2), 300, 300, false));
-        //imageView.setImageBitmap(imagesBitmapArrayList.get(position));
 
-        ViewPager vp =  (ViewPager)container;
-        vp.addView(view, 0);
+//
+        if(imagesBitmapArrayList != null && imagesBitmapArrayList.size() > 0){
+            if(!this.morePics){
+                position = position % imagesBitmapArrayList.size();
+                counter = 0;
+            }
 
-        Log.i("Finished", "Run");
-        Log.i("Finished", "outside");
+            layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            View view = layoutInflater.inflate(R.layout.custom_layout, null);
+            imageView = (ImageView) view.findViewById(R.id.customImageView);
+            imageView.setImageBitmap(Bitmap.createScaledBitmap(imagesBitmapArrayList.get(position - counter), 300, 300, false));
+            //imageView.setImageBitmap(imagesBitmapArrayList.get(position));
 
-        return view;
+            ViewPager vp = (ViewPager) container;
+            vp.addView(view, 0);
+            //this.notifyDataSetChanged();
+
+            Log.i("Finished", "Run");
+            Log.i("Finished", "outside");
+            counter ++;
+
+            return view;
+
+        }else{
+            return null;
+        }
+//        if(!morePics){
+//            position2 = position % imagesBitmapArrayList.size();
+//            Log.i("More pics", "false");
+//        }else{
+//            position2 = imagesBitmapArrayList.size() -1;
+//        }
+
+
 
     }
 
@@ -152,5 +183,16 @@ position2 = position ;
     public void notifyDataSetChanged() {
         super.notifyDataSetChanged();
 
+    }
+    public void noitfyNoMorePics(){
+        this.morePics = false;
+    }
+    public void setReady(){
+        this.ready = true;
+    }
+
+    @Override
+    public void finishUpdate(ViewGroup container) {
+        super.finishUpdate(container);
     }
 }

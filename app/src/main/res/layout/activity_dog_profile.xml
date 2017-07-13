@@ -104,7 +104,7 @@
         android:layout_alignParentStart="true" />
 
     <EditText
-        android:id="@+id/editText"
+        android:id="@+id/dogNameEditText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignStart="@+id/dogPictureImageView5"
@@ -241,26 +241,26 @@
         android:layout_alignEnd="@+id/dogPictureImageView5" />
 
     <EditText
-        android:id="@+id/editText2"
+        android:id="@+id/dogBreedEditText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignStart="@+id/editText"
-        android:layout_below="@+id/editText"
+        android:layout_alignStart="@+id/dogNameEditText"
+        android:layout_below="@+id/dogNameEditText"
         android:layout_marginTop="10dp"
         android:ems="10"
         android:hint="Breed"
         android:inputType="textPersonName" />
 
     <EditText
-        android:id="@+id/editText3"
+        android:id="@+id/dogDescriptionEditText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignStart="@+id/dogBreedEditText"
+        android:layout_below="@+id/dogBreedEditText"
+        android:layout_marginTop="13dp"
         android:ems="10"
         android:hint="Description/About"
-        android:inputType="textMultiLine"
-        android:layout_below="@+id/editText2"
-        android:layout_alignStart="@+id/editText2"
-        android:layout_marginTop="13dp" />
+        android:inputType="textMultiLine" />
 
 </RelativeLayout>
 </ScrollView>
