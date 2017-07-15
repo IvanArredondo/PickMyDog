@@ -12,6 +12,8 @@ public class User {
     private String email;
     private String phoneNumber;
     private  String profilePicture;
+    private int experiencePoints;
+    private int level;
     private  int numberOfDogs;
 
     public User() {
@@ -86,5 +88,21 @@ public class User {
 
     public void setProfilePicture(String profilePicture) {
         this.profilePicture = profilePicture;
+    }
+
+    public int getExperiencePoints() {
+        return experiencePoints;
+    }
+
+    public void setExperiencePoints(int experiencePoints) {
+        this.experiencePoints = experiencePoints;
+    }
+
+    public int getLevel() {
+        return level;
+    }
+
+    public void setLevel(int level) {
+        this.level = level;
     }
 }

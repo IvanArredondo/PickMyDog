@@ -71,5 +71,49 @@
 
     </android.support.v7.widget.CardView>
 
+    <ProgressBar
+        android:id="@+id/userLevelProgressBar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_below="@+id/profileCircleImageView"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="19dp"
+        android:indeterminate="false"
+        android:max="100"
+        android:progress="0"
+        android:progressDrawable="@drawable/circular"/>
+
+    <ProgressBar
+        android:id="@+id/dogLevelProgressBar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_below="@+id/plusDogCardView"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="16dp"
+        android:indeterminate="false"
+        android:max="100"
+        android:progress="0"
+        android:progressDrawable="@drawable/circular"/>
+
+    <TextView
+        android:id="@+id/userLevelTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="14"
+        android:layout_alignBottom="@+id/userLevelProgressBar"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="16dp" />
+
+    <TextView
+        android:id="@+id/dogLevelTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="9"
+        android:layout_alignTop="@+id/dogLevelProgressBar"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="15dp" />
+
 
 </RelativeLayout>

@@ -84,6 +84,7 @@ public class DogProfileActivity extends AppCompatActivity {
     HashMap<String, Uri> dogPictureHashMap = new HashMap<>();
 
     int numberOfDogs = 0;
+    String dogId;
 
     boolean[] isImageOccupied = new boolean[6];
 
@@ -216,12 +217,55 @@ public class DogProfileActivity extends AppCompatActivity {
 
 
         mDatabase = FirebaseDatabase.getInstance().getReference();
-        mDatabase.child("users").child(Uid).child("numberOfDogs").addListenerForSingleValueEvent(new ValueEventListener() {
+        // TODO: 2017-07-14 fix so that its not hardcoeded to "0", need to add so that when plus is clicked, the appropriate number is saved.
+        mDatabase.child("users").child(Uid).child("DogsList").child("0").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
 
-                numberOfDogs = Integer.parseInt(dataSnapshot.getValue().toString());
-                Log.i("Number of dogs: ", String.valueOf(numberOfDogs));
+                dogId = dataSnapshot.getValue().toString();
+
+                Log.i("dogId: ", String.valueOf(dogId));
+                for(final String photoName : photoNamesArray) {
+
+                    StorageReference getDogPicturesStorageReference = mStorageRef.child(Uid).child(dogId).child(photoName);
+
+                    getDogPicturesStorageReference.getBytes(ONE_MEGABYTE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
+                        @Override
+                        public void onSuccess(byte[] bytes) {
+                            Bitmap dogPictureBitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                            switch (photoName){
+                                case "floatingMainActionButton":
+                                    dogMainPictureImageView.setImageBitmap(Bitmap.createScaledBitmap(dogPictureBitmap, dogMainPictureImageView.getWidth(), dogMainPictureImageView.getHeight(), false));
+                                    break;
+                                case "floatingActionButton1":
+                                    dogPictureImageView1.setImageBitmap(dogPictureBitmap);
+                                    break;
+                                case "floatingActionButton2":
+                                    dogPictureImageView2.setImageBitmap(dogPictureBitmap);
+                                    break;
+                                case "floatingActionButton3":
+                                    dogPictureImageView3.setImageBitmap(dogPictureBitmap);
+                                    break;
+                                case "floatingActionButton4":
+                                    dogPictureImageView4.setImageBitmap(dogPictureBitmap);
+                                    break;
+                                case "floatingActionButton5":
+                                    dogPictureImageView5.setImageBitmap(dogPictureBitmap);
+                                    break;
+                                default:
+                                    Log.i("INFO: ", "Couldn't get a picture from cloud (Switch statement)");
+
+                            }
+                            // Data for "images/island.jpg" is returns, use this as needed
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception exception) {
+                            // Handle any errors
+                        }
+                    });
+                }
+
             }
 
             @Override
@@ -230,46 +274,6 @@ public class DogProfileActivity extends AppCompatActivity {
             }
         });
 
-        for(final String photoName : photoNamesArray) {
-
-            StorageReference getDogPicturesStorageReference = mStorageRef.child(Uid).child(String.valueOf(numberOfDogs)).child(photoName);
-
-            getDogPicturesStorageReference.getBytes(ONE_MEGABYTE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
-                @Override
-                public void onSuccess(byte[] bytes) {
-                    Bitmap dogPictureBitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-                    switch (photoName){
-                        case "floatingMainActionButton":
-                            dogMainPictureImageView.setImageBitmap(Bitmap.createScaledBitmap(dogPictureBitmap, dogMainPictureImageView.getWidth(), dogMainPictureImageView.getHeight(), false));
-                            break;
-                        case "floatingActionButton1":
-                            dogPictureImageView1.setImageBitmap(dogPictureBitmap);
-                            break;
-                        case "floatingActionButton2":
-                            dogPictureImageView2.setImageBitmap(dogPictureBitmap);
-                            break;
-                        case "floatingActionButton3":
-                            dogPictureImageView3.setImageBitmap(dogPictureBitmap);
-                            break;
-                        case "floatingActionButton4":
-                            dogPictureImageView4.setImageBitmap(dogPictureBitmap);
-                            break;
-                        case "floatingActionButton5":
-                            dogPictureImageView5.setImageBitmap(dogPictureBitmap);
-                            break;
-                        default:
-                            Log.i("INFO: ", "Couldn't get a picture from cloud (Switch statement)");
-
-                    }
-                    // Data for "images/island.jpg" is returns, use this as needed
-                }
-            }).addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception exception) {
-                    // Handle any errors
-                }
-            });
-        }
 
     }
 

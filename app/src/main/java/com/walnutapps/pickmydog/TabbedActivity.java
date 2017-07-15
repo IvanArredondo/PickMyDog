@@ -48,6 +48,8 @@ public class TabbedActivity extends AppCompatActivity {
    public String Uid;
     int numberOfDogs;
 
+    String[] dogIdList;
+
     DatabaseReference mDatabase;
 
     public void addDogClick(View v){
@@ -87,12 +89,18 @@ public class TabbedActivity extends AppCompatActivity {
 
         Uid = getIntent().getStringExtra("Uid");
 
-        mDatabase.child("users").child(Uid).child("numberOfDogs").addListenerForSingleValueEvent(new ValueEventListener() {
+        mDatabase.child("users").child(Uid).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
 
 
-                numberOfDogs = Integer.parseInt(dataSnapshot.getValue().toString());
+                numberOfDogs = Integer.parseInt(dataSnapshot.child("numberOfDogs").getValue().toString());
+
+                dogIdList = new String[1];
+
+                for(int i = 0; i < numberOfDogs; i++){
+                    dogIdList[i] = dataSnapshot.child("DogsList").child(String.valueOf(i)).getValue().toString();
+                }
                 Log.i("On create of dogs: ", String.valueOf(numberOfDogs));
 
             }
@@ -102,6 +110,8 @@ public class TabbedActivity extends AppCompatActivity {
 
             }
         });
+
+
 
 
 
@@ -163,7 +173,7 @@ public class TabbedActivity extends AppCompatActivity {
             //returning the current tabs
             switch (position){
                 case 0:
-                    TabProfile tabProfile = new TabProfile(Uid, numberOfDogs);
+                    TabProfile tabProfile = new TabProfile(Uid, numberOfDogs, dogIdList);
                     return tabProfile;
                 case 1:
                     TabVersus tabVersus = new TabVersus();

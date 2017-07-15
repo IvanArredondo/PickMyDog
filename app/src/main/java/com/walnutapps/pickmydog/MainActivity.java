@@ -120,19 +120,16 @@ public class MainActivity extends AppCompatActivity {
                 Log.d("info: ", "facebook:onSuccess: " + loginResult.getAccessToken().getUserId());
                 handleFacebookAccessToken(loginResult.getAccessToken());
 
-                // TODO: 2017-06-22
             }
 
             @Override
             public void onCancel() {
                 Log.d("Info: ", "facebook:onCancel");
-                // TODO: 2017-06-22  
             }
 
             @Override
             public void onError(FacebookException error) {
                 Log.d("info: ", "facebook:onError", error);
-                // TODO: 2017-06-22
             }
         });
     }
