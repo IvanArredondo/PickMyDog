@@ -50,6 +50,8 @@ public class TabbedActivity extends AppCompatActivity {
 
     String[] dogIdList;
 
+    int totalUserExp;
+
     DatabaseReference mDatabase;
 
     public void addDogClick(View v){
@@ -95,6 +97,8 @@ public class TabbedActivity extends AppCompatActivity {
 
 
                 numberOfDogs = Integer.parseInt(dataSnapshot.child("numberOfDogs").getValue().toString());
+
+                totalUserExp = Integer.parseInt(dataSnapshot.child("experiencePoints").getValue().toString());
 
                 dogIdList = new String[1];
 
@@ -176,7 +180,7 @@ public class TabbedActivity extends AppCompatActivity {
                     TabProfile tabProfile = new TabProfile(Uid, numberOfDogs, dogIdList);
                     return tabProfile;
                 case 1:
-                    TabVersus tabVersus = new TabVersus();
+                    TabVersus tabVersus = new TabVersus(Uid, dogIdList, totalUserExp);
                     return tabVersus;
                 case 2:
                     TabLeaderboard tabLeaderboard = new TabLeaderboard();

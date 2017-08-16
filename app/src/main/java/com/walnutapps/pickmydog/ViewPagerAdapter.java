@@ -11,13 +11,17 @@ import android.support.annotation.NonNull;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
+import android.view.GestureDetector;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.squareup.picasso.Downloader;
@@ -33,13 +37,13 @@ import static com.walnutapps.pickmydog.R.id.dogPictureImageView5;
  * Created by Ivan on 2017-07-08.
  */
 
-public class ViewPagerAdapter extends PagerAdapter {
+public class ViewPagerAdapter extends PagerAdapter{
 
     private Context context;
     private LayoutInflater layoutInflater;
     ImageView imageView;
     private Integer[] images;
-    String Uid = "";
+
     String[] photoNamesArray = {"floatingMainActionButton","floatingActionButton1", "floatingActionButton2", "floatingActionButton3", "floatingActionButton4", "floatingActionButton5"};
     ArrayList<Bitmap> imagesBitmapArrayList = new ArrayList<>();
     Bitmap[] imagesBitmapArray = new Bitmap[6];
@@ -50,8 +54,6 @@ public class ViewPagerAdapter extends PagerAdapter {
 
     Bitmap bitmap;
 
-    private StorageReference mStorageRef;
-
     boolean morePics = true;
     boolean ready = false;
     int counter;
@@ -59,10 +61,9 @@ public class ViewPagerAdapter extends PagerAdapter {
 
 
 
-    public ViewPagerAdapter(Context context){
-        mStorageRef = FirebaseStorage.getInstance().getReference();
-        //
 
+    public ViewPagerAdapter(Context context){
+        //
         this.context = context;
 //        this.Uid = Uid;
 //        this.dogNumber = dogNumber;
@@ -71,33 +72,11 @@ public class ViewPagerAdapter extends PagerAdapter {
         //getImages();
     }
 
-    private void getImages() {
-        int count = 0;
-
-        for(final String photoName : photoNamesArray) {
-            StorageReference getDogPicturesStorageReference = mStorageRef.child(Uid).child(String.valueOf(dogNumber)).child(photoName);
-
-            final int finalCount = count;
-            getDogPicturesStorageReference.getBytes(ONE_MEGABYTE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
-                @Override
-                public void onSuccess(byte[] bytes) {
-                    Bitmap dogPictureBitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-                    imagesBitmapArray[finalCount] = dogPictureBitmap;
-
-
-                    // Data for "images/island.jpg" is returns, use this as needed
-                }
-            });
-            count ++;
-        }
-
-    }
 
     @Override
     public int getCount() {
         if (imagesBitmapArrayList != null && imagesBitmapArrayList.size() > 0)
         {
-            Log.i("in the If:", "viewpageradapter if state");
             return imagesBitmapArrayList.size()*LOOPS_COUNT; // simulate infinite by big number of products
         }
         else
@@ -135,9 +114,25 @@ public class ViewPagerAdapter extends PagerAdapter {
             }
 
             layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            View view = layoutInflater.inflate(R.layout.custom_layout, null);
+            final View view = layoutInflater.inflate(R.layout.custom_layout, null);
             imageView = (ImageView) view.findViewById(R.id.customImageView);
             imageView.setImageBitmap(Bitmap.createScaledBitmap(imagesBitmapArrayList.get(position - counter), 300, 300, false));
+//            imageView.setOnTouchListener(new View.OnTouchListener() {
+//                private GestureDetector gestureDetector = new GestureDetector(view.getContext(), new GestureDetector.SimpleOnGestureListener(){
+//                    @Override
+//                    public boolean onDoubleTap(MotionEvent e) {
+//                        Log.i("Please ", "work");
+//                        refreshVsTab();
+//                        givePointsToDog();
+//                        return super.onDoubleTap(e);
+//                    }
+//                });
+//                @Override
+//                public boolean onTouch(View v, MotionEvent event) {
+//                    gestureDetector.onTouchEvent(event);
+//                    return true;
+//                }
+//            });
             //imageView.setImageBitmap(imagesBitmapArrayList.get(position));
 
             ViewPager vp = (ViewPager) container;
@@ -164,6 +159,11 @@ public class ViewPagerAdapter extends PagerAdapter {
 
     }
 
+    private void refreshVsTab() {
+
+    }
+
+
     @Override
     public void destroyItem(ViewGroup container, int position, Object object) {
 
@@ -184,15 +184,18 @@ public class ViewPagerAdapter extends PagerAdapter {
         super.notifyDataSetChanged();
 
     }
-    public void noitfyNoMorePics(){
+    public void noitfyNoMorePics() {
         this.morePics = false;
     }
     public void setReady(){
+
         this.ready = true;
     }
 
     @Override
     public void finishUpdate(ViewGroup container) {
+
         super.finishUpdate(container);
     }
+
 }

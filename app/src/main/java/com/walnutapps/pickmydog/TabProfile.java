@@ -138,7 +138,7 @@ public class  TabProfile extends Fragment {
         }else {
 
             // TODO: 2017-07-13 consider changing this to save the profile picture in the storage
-            mDatabase.child("users").child(Uid).addListenerForSingleValueEvent(new ValueEventListener() {
+            mDatabase.child("users").child(Uid).addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
 
@@ -203,27 +203,32 @@ public class  TabProfile extends Fragment {
             animationDog.start ();
 
         }else{
-            mDatabase.child("dogs").child(dogIdList[0]).addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    dogLevel = Integer.parseInt(dataSnapshot.child("level").getValue().toString());
-                    dogLevelTextView.setText(String.valueOf(dogLevel));
+            try {
+                mDatabase.child("dogs").child(dogIdList[0]).addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        dogLevel = Integer.parseInt(dataSnapshot.child("level").getValue().toString());
+                        dogLevelTextView.setText(String.valueOf(dogLevel));
 
-                    dogExp = Integer.parseInt(dataSnapshot.child("totalExp").getValue().toString());
+                        dogExp = Integer.parseInt(dataSnapshot.child("totalExp").getValue().toString());
 
-                    float dogLevelProgress = getLevelProgress(dogExp, dogLevel);
+                        float dogLevelProgress = getLevelProgress(dogExp, dogLevel);
 
-                    ObjectAnimator animationUser = ObjectAnimator.ofInt (dogLeveProgressBar, "progress", 0, (int)dogLevelProgress); // see this max value coming back here, we animale towards that value
-                    animationUser.setDuration (1000); //in milliseconds
-                    animationUser.setInterpolator (new DecelerateInterpolator());
-                    animationUser.start ();
-                }
+                        ObjectAnimator animationUser = ObjectAnimator.ofInt (dogLeveProgressBar, "progress", 0, (int)dogLevelProgress); // see this max value coming back here, we animale towards that value
+                        animationUser.setDuration (1000); //in milliseconds
+                        animationUser.setInterpolator (new DecelerateInterpolator());
+                        animationUser.start ();
+                    }
 
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
 
-                }
-            });
+                    }
+                });
+            } catch (Exception e){
+                Log.i("dog retrieval", e.getMessage());
+            }
+
         }
 
 
@@ -235,48 +240,64 @@ public class  TabProfile extends Fragment {
             Log.i("dog image: ", "saved in memory");
             dogPictureImageView.setImageDrawable(dogRoundedPictureBitmap);
         } else {
-            StorageReference dogProfilePictureStorageReference = mStorageRef.child(Uid).child(dogIdList[0]).child("floatingMainActionButton");
-            dogProfilePictureStorageReference.getBytes(ONE_MEGABYTE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
-                @Override
-                public void onSuccess(byte[] bytes) {
-                    Bitmap dogProfilePictureBitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-                    Log.i("HERRREEE", "NOW");
+            try {
+                StorageReference dogProfilePictureStorageReference = mStorageRef.child(Uid).child(dogIdList[0]).child("floatingMainActionButton");
+                dogProfilePictureStorageReference.getBytes(ONE_MEGABYTE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
+                    @Override
+                    public void onSuccess(byte[] bytes) {
+                        Bitmap dogProfilePictureBitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                        Log.i("HERRREEE", "NOW");
 
-                    dogRoundedPictureBitmap = RoundedBitmapDrawableFactory.create(getResources(), dogProfilePictureBitmap);
-                    //roundedPicture.setCornerRadius(Math.max(profilePictureBitmap.getWidth(), profilePictureBitmap.getHeight()) / 2.0f);
-                    dogRoundedPictureBitmap.setCircular(true);
-                    dogPictureImageView.setImageDrawable(dogRoundedPictureBitmap);
+                        dogRoundedPictureBitmap = RoundedBitmapDrawableFactory.create(getResources(), dogProfilePictureBitmap);
+                        //roundedPicture.setCornerRadius(Math.max(profilePictureBitmap.getWidth(), profilePictureBitmap.getHeight()) / 2.0f);
+                        dogRoundedPictureBitmap.setCircular(true);
+                        dogPictureImageView.setImageDrawable(dogRoundedPictureBitmap);
 
 
-                    Log.i("HERRREEE", "NOW SET THE PIC");
+                        Log.i("HERRREEE", "NOW SET THE PIC");
 
-                }
-            }).addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception exception) {
-                    //Toast.makeText(rootView.getContext(), "dog image download failed", Toast.LENGTH_SHORT).show();
-                }
-            });
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception exception) {
+                        //Toast.makeText(rootView.getContext(), "dog image download failed", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }catch (Exception e){
+                Log.i("dog retrieval", e.getMessage());
+            }
 
         }
         return rootView;
     }
 
-    public float getLevelProgress(int totalExp, int level){
+    public float getLevelProgress(int totalExp, int level2){
 
-        float levelProgress = 0;
+        double levelProgress = 0;
+        double newTotal = (double)totalExp;
 
-        if(totalExp == -1 || level == -1){
+        Log.i("totalExp             ", " " + totalExp);
+
+        if(totalExp == -1 || level2 == -1){
             Toast.makeText(getContext(), "Unable to get level stats, reconnect", Toast.LENGTH_SHORT).show();
             Log.i("Level Progress: ", String.valueOf(levelProgress));
         }else{
-            levelProgress = (((totalExp/100f) - (level*(level+1f))/2f)/(level + 1f))*100f;
+            //levelProgress = (((totalExp/100f) - (level*(level+1f))/2f)/(level + 1f))*100f;
+            //levelProgress = (((totalExp/100d) - ((((Math.sqrt(((8d*Math.floor(totalExp/100d))+1d)))-1d)/2))*((((Math.sqrt(((8d*Math.floor(totalExp/100d))+1d)-1d))/2)/100)+1d))/2d))/(((((Math.sqrt(((8d*Math.floor(totalExp/100d))+1d)-1d))/2)/100)+1d))) * 100d;
+
+
+            double totalExperience=newTotal/100d;
+            double level=Math.floor((Math.sqrt(8d*totalExperience+1d)-1d)/2d);
+            double triangularExperience=(level*(level+1d))/2d;
+            levelProgress =((totalExperience-triangularExperience)/(level+1d))*100d;
+
+
             Log.i("Level Progress: ", String.valueOf(levelProgress));
             Toast.makeText(getContext(), "Level Progress" + levelProgress, Toast.LENGTH_SHORT).show();
 
         }
 
-        return levelProgress;
+        return (float)levelProgress;
 
     }
 

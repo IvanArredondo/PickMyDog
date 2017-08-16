@@ -1,8 +1,12 @@
 package com.walnutapps.pickmydog;
 
 import android.content.Context;
+import android.support.v4.view.GestureDetectorCompat;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
+import android.util.Log;
+import android.view.GestureDetector;
+import android.view.MotionEvent;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.Scroller;
 
@@ -12,11 +16,14 @@ import java.lang.reflect.Field;
  * Created by Ivan on 2017-07-09.
  */
 
-public class MyViewPager extends ViewPager
-{
+public class MyViewPager extends ViewPager{
+
+
     public MyViewPager(Context context, AttributeSet attrs)
     {
         super( context, attrs );
+
+
         setMyScroller();
     }
     private void setMyScroller()
@@ -33,6 +40,8 @@ public class MyViewPager extends ViewPager
         }
     }
 
+
+
     public class MyScroller extends Scroller
     {
         public MyScroller(Context context)
@@ -46,4 +55,5 @@ public class MyViewPager extends ViewPager
             super.startScroll(startX, startY, dx, dy, 500 /*1 secs*/);
         }
     }
+
 }

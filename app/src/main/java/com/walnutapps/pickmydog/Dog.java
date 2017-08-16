@@ -28,6 +28,7 @@ public class Dog {
         this.name = name;
         this.breed = breed;
         this.description = description;
+        this.ownerId = ownerId;
 
     }
 
